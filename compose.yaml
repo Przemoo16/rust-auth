@@ -8,9 +8,7 @@ services:
         source: db-data
         target: /var/lib/postgresql/data
     environment:
-      POSTGRES_PASSWORD: "${DB_PASSWORD}"
-      POSTGRES_USER: "${DB_USER}"
-      POSTGRES_DB: "${DB_NAME}"
+      POSTGRES_PASSWORD: postgres
 
 volumes:
   db-data:
