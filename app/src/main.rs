@@ -8,9 +8,6 @@ mod db;
 mod server;
 mod state;
 
-// TODO:
-// 1. Do I need the tls-native-tls feature in the sqlx
-
 #[tokio::main]
 async fn main() {
     dotenv().ok();

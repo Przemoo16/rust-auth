@@ -5,9 +5,13 @@ use sqlx::{postgres::PgPool, query};
 pub async fn run_server(db: PgPool) {
     let state = AppState::new(db);
     let app = Router::new().route("/", get(home)).with_state(state);
-    let listener = tokio::net::TcpListener::bind("0.0.0.0:3000")
+    let port = "3000";
+    let listener = tokio::net::TcpListener::bind(format!("0.0.0.0:{}", port))
         .await
-        .expect("Failed to create TCP listener");
+        .expect(&format!(
+            "Failed to create listener bound to the port {}",
+            port
+        ));
     axum::serve(listener, app)
         .await
         .expect("Failed to run the server");
