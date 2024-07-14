@@ -3,6 +3,7 @@ use db::create_db_pool;
 use dotenv::dotenv;
 use server::run_server;
 
+mod api;
 mod config;
 mod db;
 mod server;
