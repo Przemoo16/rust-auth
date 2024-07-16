@@ -2,6 +2,7 @@ use crate::operations::auth::{signup, SignupData, SignupError};
 use crate::state::AppState;
 use axum::{extract::State, http::StatusCode, response::IntoResponse, routing::post, Form, Router};
 use serde::Deserialize;
+use tracing::error;
 use validator::Validate;
 
 pub fn create_auth_router() -> Router<AppState> {
@@ -38,9 +39,11 @@ async fn post_signup(
     {
         Ok(_) => StatusCode::CREATED.into_response(),
         Err(e) => match e {
-            SignupError::UserAlreadyExistsError => StatusCode::CONFLICT.into_response(),
-            // TODO: Log error
-            _ => StatusCode::INTERNAL_SERVER_ERROR.into_response(),
+            SignupError::UserEmailAlreadyExistsError => StatusCode::CONFLICT.into_response(),
+            _ => {
+                error!("Failed to signup: {:?}", e);
+                StatusCode::INTERNAL_SERVER_ERROR.into_response()
+            }
         },
     }
 }

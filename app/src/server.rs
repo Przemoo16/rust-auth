@@ -3,6 +3,7 @@ use crate::api::main::create_main_router;
 use crate::db::connection::Database;
 use crate::state::AppState;
 use axum::Router;
+use std::net::SocketAddr;
 
 pub async fn run_server(db: Database) {
     let state = AppState::new(db);
@@ -10,13 +11,14 @@ pub async fn run_server(db: Database) {
         .nest("/", create_main_router())
         .nest("/", create_auth_router())
         .with_state(state);
-    let port = "3000";
-    let listener = tokio::net::TcpListener::bind(format!("0.0.0.0:{}", port))
+    let socket_address = SocketAddr::from(([0, 0, 0, 0], 3000));
+    let listener = tokio::net::TcpListener::bind(&socket_address)
         .await
         .expect(&format!(
-            "Failed to create listener bound to the port {}",
-            port
+            "Failed to create listener bound to the {}",
+            &socket_address
         ));
+    tracing::info!("Running server on {}", socket_address);
     axum::serve(listener, app)
         .await
         .expect("Failed to run the server");
