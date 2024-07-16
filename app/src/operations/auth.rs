@@ -11,12 +11,11 @@ pub enum SignupError {
 
 pub struct SignupData<'a> {
     pub email: &'a str,
-    pub password: &'a str,
+    pub password: String,
 }
 
 pub async fn signup(data: SignupData<'_>, db: &Database) -> Result<(), SignupError> {
-    let password = data.password.to_string();
-    let hashed_password = task::spawn_blocking(move || hash_password(&password))
+    let hashed_password = task::spawn_blocking(move || hash_password(&data.password))
         .await
         .map_err(|_| SignupError::HashPasswordError)?
         .map_err(|_| SignupError::HashPasswordError)?;

@@ -12,21 +12,17 @@ pub struct CreateUserData<'a> {
 }
 
 pub async fn create_user(data: CreateUserData<'_>, db: &Database) -> Result<(), CreateUserError> {
-    let res = query_as!(
+    query_as!(
         User,
         "INSERT INTO users (email, password) VALUES ($1, $2)",
         data.email,
         data.password
     )
     .execute(db)
-    .await;
-    if let Err(e) = res {
-        if let Some(e) = e.as_database_error() {
-            if e.is_unique_violation() {
-                return Err(CreateUserError::EmailAlreadyExistsError);
-            }
-        }
-        return Err(CreateUserError::DatabaseError);
-    }
+    .await
+    .map_err(|e| match e.as_database_error() {
+        Some(e) if e.is_unique_violation() => CreateUserError::EmailAlreadyExistsError,
+        _ => CreateUserError::DatabaseError,
+    })?;
     Ok(())
 }

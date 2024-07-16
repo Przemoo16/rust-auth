@@ -30,7 +30,7 @@ async fn post_signup(
     match signup(
         SignupData {
             email: &data.email,
-            password: &data.password,
+            password: data.password,
         },
         &state.db,
     )
