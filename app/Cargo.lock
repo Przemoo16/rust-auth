@@ -51,6 +51,7 @@ version = "0.1.0"
 dependencies = [
  "argon2",
  "askama",
+ "askama_axum",
  "axum",
  "dotenv",
  "serde",
@@ -83,6 +84,16 @@ dependencies = [
  "humansize",
  "num-traits",
  "percent-encoding",
+]
+
+[[package]]
+name = "askama_axum"
+version = "0.5.0"
+source = "git+https://github.com/djc/askama#382b5f6a4e3e50676283957ed38d8f719ad6b5df"
+dependencies = [
+ "askama",
+ "axum-core",
+ "http",
 ]
 
 [[package]]

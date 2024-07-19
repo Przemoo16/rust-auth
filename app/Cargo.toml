@@ -5,8 +5,9 @@ edition = "2021"
 
 [dependencies]
 argon2 = { version = "0.5.3", features = ["std"] }
-# TODO: Remove git branch after 0.3.0 is released
-askama = { git = "https://github.com/djc/askama", features = ["with-axum"] }
+# TODO: Remove git branch and use with-axum feature after 0.13.0 is released
+askama = { git = "https://github.com/djc/askama" }
+askama_axum = { git = "https://github.com/djc/askama" }
 axum = "0.7.5"
 dotenv = "0.15.0"
 serde = { version = "1.0.204", features = ["derive"] }
