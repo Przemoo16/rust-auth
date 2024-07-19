@@ -1,16 +1,21 @@
 <!DOCTYPE html>
 <html lang="en">
 
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1">
-    {% block title %}<title>MySite</title>{% endblock %}
-</head>
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        {% block title %}<title>MySite</title>{% endblock %}
+        <!-- FIXME: Do not use CDNs on production: https://blog.wesleyac.com/posts/why-not-javascript-cdn -->
+        <script src="https://unpkg.com/htmx.org@2.0.1"
+            integrity="sha384-QWGpdj554B4ETpJJC9z+ZHJcA/i59TyjxEPXiiUgN2WmTyV5OEZWCD6gQhgkdpB/"
+            crossorigin="anonymous">
+        </script>
+    </head>
 
-<body>
-    <div id="content">
-        {% block content %}{% endblock %}
-    </div>
-</body>
+    <body>
+        <div id="content">
+            {% block content %}{% endblock %}
+        </div>
+    </body>
 
 </html>
