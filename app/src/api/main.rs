@@ -7,7 +7,7 @@ pub fn create_main_router() -> Router<AppState> {
 }
 
 #[derive(Template)]
-#[template(path = "pages/home/index.html")]
+#[template(path = "home/index.html")]
 struct HomeTemplate {}
 
 async fn home() -> HomeTemplate {

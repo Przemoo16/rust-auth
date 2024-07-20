@@ -1,12 +1,21 @@
 use crate::operations::auth::{signup, SignupData, SignupError};
 use crate::state::AppState;
-use axum::{extract::State, http::StatusCode, response::IntoResponse, routing::post, Form, Router};
+use askama_axum::Template;
+use axum::{extract::State, http::StatusCode, response::IntoResponse, routing::get, Form, Router};
 use serde::Deserialize;
 use tracing::error;
 use validator::Validate;
 
 pub fn create_auth_router() -> Router<AppState> {
-    Router::new().route("/signup", post(post_signup))
+    Router::new().route("/signup", get(get_signup).post(post_signup))
+}
+
+#[derive(Template)]
+#[template(path = "signup/index.html")]
+struct SignupTemplate {}
+
+async fn get_signup() -> SignupTemplate {
+    SignupTemplate {}
 }
 
 #[derive(Validate, Deserialize)]
@@ -17,8 +26,7 @@ struct SignupRequest {
     #[validate(length(min = 8, max = 64))]
     password: String,
     #[validate(must_match(other = "password"))]
-    #[serde(rename = "confirmed-password")]
-    confirmed_password: String,
+    confirm_password: String,
 }
 
 async fn post_signup(
