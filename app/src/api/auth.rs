@@ -1,7 +1,14 @@
+use crate::api::middlewares::RenderOptions;
 use crate::operations::auth::{signup, SignupData, SignupError};
 use crate::state::AppState;
 use askama_axum::Template;
-use axum::{extract::State, http::StatusCode, response::IntoResponse, routing::get, Form, Router};
+use axum::{
+    extract::{Extension, State},
+    http::StatusCode,
+    response::IntoResponse,
+    routing::get,
+    Form, Router,
+};
 use serde::Deserialize;
 use tracing::error;
 use validator::Validate;
@@ -12,10 +19,12 @@ pub fn create_auth_router() -> Router<AppState> {
 
 #[derive(Template)]
 #[template(path = "signup/index.html")]
-struct SignupTemplate {}
+struct SignupTemplate {
+    options: RenderOptions,
+}
 
-async fn get_signup() -> SignupTemplate {
-    SignupTemplate {}
+async fn get_signup(Extension(options): Extension<RenderOptions>) -> SignupTemplate {
+    SignupTemplate { options }
 }
 
 #[derive(Validate, Deserialize)]

@@ -1,6 +1,7 @@
+use crate::api::middlewares::RenderOptions;
 use crate::state::AppState;
 use askama_axum::Template;
-use axum::{routing::get, Router};
+use axum::{extract::Extension, routing::get, Router};
 
 pub fn create_main_router() -> Router<AppState> {
     Router::new().route("/", get(home))
@@ -8,8 +9,10 @@ pub fn create_main_router() -> Router<AppState> {
 
 #[derive(Template)]
 #[template(path = "home/index.html")]
-struct HomeTemplate {}
+struct HomeTemplate {
+    options: RenderOptions,
+}
 
-async fn home() -> HomeTemplate {
-    HomeTemplate {}
+async fn home(Extension(options): Extension<RenderOptions>) -> HomeTemplate {
+    HomeTemplate { options }
 }
