@@ -1,6 +1,7 @@
 CREATE TABLE users (
     id SERIAL PRIMARY KEY,
     email VARCHAR(254) NOT NULL UNIQUE,
-    password VARCHAR(128) NOT NULL
+    password VARCHAR(128) NOT NULL,
+    created_at TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP
 );
 CREATE INDEX ix_users_email ON users(email);
