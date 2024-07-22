@@ -1,9 +1,10 @@
 use crate::api::middlewares::RenderOptions;
 use crate::constants::auth::{
     EMAIL_IS_ALREADY_TAKEN_MESSAGE, EMAIL_MAX_LENGTH, EMAIL_TOO_LONG_MESSAGE,
-    FIELD_REQUIRED_MESSAGE, PASSWORD_MAX_LENGTH, PASSWORD_MIN_LENGTH, PASSWORD_MISMATCH_MESSAGE,
-    PASSWORD_TOO_LONG_MESSAGE, PASSWORD_TOO_SHORT_MESSAGE,
+    FIELD_REQUIRED_MESSAGE, INVALID_EMAIL_MESSAGE, PASSWORD_MAX_LENGTH, PASSWORD_MIN_LENGTH,
+    PASSWORD_MISMATCH_MESSAGE, PASSWORD_TOO_LONG_MESSAGE, PASSWORD_TOO_SHORT_MESSAGE,
 };
+use crate::libs::validation::is_valid_email;
 use crate::operations::auth::{signup, SignupData, SignupError};
 use crate::state::AppState;
 use askama_axum::Template;
@@ -159,6 +160,10 @@ fn validate_signup_request(data: &SignupRequest) -> Result<(), SignupFormData> {
     }
     if data.email.len() > EMAIL_MAX_LENGTH {
         errors.email.push(EMAIL_TOO_LONG_MESSAGE);
+        focus = SignupFormField::Email;
+    }
+    if !is_valid_email(&data.email) {
+        errors.email.push(INVALID_EMAIL_MESSAGE);
         focus = SignupFormField::Email;
     }
     if !errors.has_errors() {
