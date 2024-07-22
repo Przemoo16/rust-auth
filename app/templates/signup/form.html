@@ -1,0 +1,36 @@
+<form hx-post="/signup" hx-swap="outerHTML">
+    <label>
+        Email:
+        <input type="text" name="email"
+            {% if !form_data.values.email.is_empty() %}
+            value="{{ form_data.values.email }}"
+            {% endif %}
+            {% if let SignupFormField::Email=form_data.focus %}
+            autofocus
+            {% endif %} />
+    </label>
+    {% for error in form_data.errors.email %}
+    <div style="color: red">{{ error }}</div>
+    {% endfor %}
+    <label>
+        Password:
+        <input type="password" name="password"
+            {% if let SignupFormField::Password=form_data.focus %}
+            autofocus
+            {% endif %} />
+    </label>
+    {% for error in form_data.errors.password %}
+    <div style="color: red">{{ error }}</div>
+    {% endfor %}
+    <label>
+        Confirm Password:
+        <input type="password" name="confirm_password"
+            {% if let SignupFormField::ConfirmPassword=form_data.focus %}
+            autofocus
+            {% endif %} />
+    </label>
+    {% for error in form_data.errors.confirm_password %}
+    <div style="color: red">{{ error }}</div>
+    {% endfor %}
+    <button type="submit">Submit</button>
+</form>

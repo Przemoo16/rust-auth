@@ -1,7 +1,5 @@
 {% extends "layout.html" %}
 
 {% block content %}
-<div hx-target="#main">
-    <a hx-get="/signup" hx-push-url="true">Sign up</a>
-</div>
+<a hx-get="/signup" hx-target="#main" hx-push-url="true">Sign up</a>
 {% endblock content %}
