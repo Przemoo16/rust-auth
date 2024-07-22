@@ -141,11 +141,19 @@ async fn post_signup(
 fn validate_signup_request(data: &SignupRequest) -> Result<(), SignupFormData> {
     let mut focus = SignupFormField::Email;
     let mut errors = SignupFormErrors::default();
-    if data.password != data.confirm_password {
+    if data.confirm_password.is_empty() {
+        errors.confirm_password.push(FIELD_REQUIRED_MESSAGE);
+        focus = SignupFormField::ConfirmPassword;
+    }
+    if !data.confirm_password.is_empty() && data.password != data.confirm_password {
         errors.confirm_password.push(PASSWORD_MISMATCH_MESSAGE);
         focus = SignupFormField::ConfirmPassword;
     }
-    if data.password.len() < PASSWORD_MIN_LENGTH {
+    if data.password.is_empty() {
+        errors.password.push(FIELD_REQUIRED_MESSAGE);
+        focus = SignupFormField::Password;
+    }
+    if !data.password.is_empty() && data.password.len() < PASSWORD_MIN_LENGTH {
         errors.password.push(PASSWORD_TOO_SHORT_MESSAGE);
         focus = SignupFormField::Password;
     }
@@ -153,7 +161,6 @@ fn validate_signup_request(data: &SignupRequest) -> Result<(), SignupFormData> {
         errors.password.push(PASSWORD_TOO_LONG_MESSAGE);
         focus = SignupFormField::Password;
     }
-    // TODO: Add email validation
     if data.email.is_empty() {
         errors.email.push(FIELD_REQUIRED_MESSAGE);
         focus = SignupFormField::Email;
@@ -162,7 +169,7 @@ fn validate_signup_request(data: &SignupRequest) -> Result<(), SignupFormData> {
         errors.email.push(EMAIL_TOO_LONG_MESSAGE);
         focus = SignupFormField::Email;
     }
-    if !is_valid_email(&data.email) {
+    if !data.email.is_empty() && !is_valid_email(&data.email) {
         errors.email.push(INVALID_EMAIL_MESSAGE);
         focus = SignupFormField::Email;
     }

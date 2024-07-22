@@ -3,7 +3,7 @@ use regex::Regex;
 
 // Regex from the specs: https://html.spec.whatwg.org/multipage/forms.html#valid-e-mail-address
 static EMAIL_REGEX: Lazy<Regex> = Lazy::new(|| {
-    Regex::new(r"^[a-zA-Z0-9.!#$%&'*+/=?^_`{|}~-]+@[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?(?:\\.[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?)*$").expect("Wrong regex pattern")
+    Regex::new(r"^[a-zA-Z0-9.!#$%&'*+/=?^_`{|}~-]+@[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?(?:\.[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?)*$").expect("Wrong regex pattern")
 });
 
 pub fn is_valid_email(email: &str) -> bool {
