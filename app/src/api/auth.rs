@@ -22,52 +22,31 @@ pub fn create_auth_router() -> Router<AppState> {
     Router::new().route("/signup", get(get_signup).post(post_signup))
 }
 
+#[derive(Default)]
 struct SignupFormData<'a> {
     focus: SignupFormField,
     values: SignupFormValues<'a>,
     errors: SignupFormErrors<'a>,
 }
 
-impl Default for SignupFormData<'_> {
-    fn default() -> Self {
-        Self {
-            focus: SignupFormField::Email,
-            values: SignupFormValues::default(),
-            errors: SignupFormErrors::default(),
-        }
-    }
-}
-
+#[derive(Default)]
 enum SignupFormField {
+    #[default]
     Email,
     Password,
     ConfirmPassword,
 }
 
+#[derive(Default)]
 struct SignupFormValues<'a> {
     email: &'a str,
 }
 
-impl Default for SignupFormValues<'_> {
-    fn default() -> Self {
-        Self { email: "" }
-    }
-}
-
+#[derive(Default)]
 struct SignupFormErrors<'a> {
     email: Option<&'a str>,
     password: Option<&'a str>,
     confirm_password: Option<&'a str>,
-}
-
-impl Default for SignupFormErrors<'_> {
-    fn default() -> Self {
-        Self {
-            email: None,
-            password: None,
-            confirm_password: None,
-        }
-    }
 }
 
 impl SignupFormErrors<'_> {
@@ -123,10 +102,12 @@ async fn post_signup(
         Ok(_) => StatusCode::CREATED.into_response(),
         Err(e) => match e {
             SignupError::UserEmailAlreadyExistsError => {
-                let mut form_data = SignupFormData::default();
                 let mut errors = SignupFormErrors::default();
                 errors.email = Some(EMAIL_IS_ALREADY_TAKEN_MESSAGE);
-                form_data.errors = errors;
+                let form_data = SignupFormData {
+                    errors,
+                    ..Default::default()
+                };
                 let template = SignupFormTemplate { form_data };
                 (StatusCode::CONFLICT, template).into_response()
             }
@@ -139,7 +120,7 @@ async fn post_signup(
 }
 
 fn validate_signup_request(data: &SignupRequest) -> Result<(), SignupFormData> {
-    let mut focus = SignupFormField::Email;
+    let mut focus = SignupFormField::default();
     let mut errors = SignupFormErrors::default();
 
     if data.confirm_password.is_empty() {
