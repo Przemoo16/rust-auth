@@ -9,3 +9,14 @@ static EMAIL_REGEX: Lazy<Regex> = Lazy::new(|| {
 pub fn is_valid_email(email: &str) -> bool {
     EMAIL_REGEX.is_match(email)
 }
+
+#[cfg(test)]
+mod tests {
+    use super::is_valid_email;
+
+    #[test]
+    fn test_is_valid_email() {
+        assert!(is_valid_email("test@email.com"));
+        assert!(!is_valid_email("test"));
+    }
+}
