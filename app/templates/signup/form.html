@@ -9,9 +9,9 @@
             autofocus
             {% endif %} />
     </label>
-    {% for error in form_data.errors.email %}
+    {% if let Some(error) = form_data.errors.email %}
     <div style="color: red">{{ error }}</div>
-    {% endfor %}
+    {% endif %}
     <label>
         Password:
         <input type="password" name="password"
@@ -19,9 +19,9 @@
             autofocus
             {% endif %} />
     </label>
-    {% for error in form_data.errors.password %}
+    {% if let Some(error) = form_data.errors.password %}
     <div style="color: red">{{ error }}</div>
-    {% endfor %}
+    {% endif %}
     <label>
         Confirm Password:
         <input type="password" name="confirm_password"
@@ -29,8 +29,8 @@
             autofocus
             {% endif %} />
     </label>
-    {% for error in form_data.errors.confirm_password %}
+    {% if let Some(error) = form_data.errors.confirm_password %}
     <div style="color: red">{{ error }}</div>
-    {% endfor %}
+    {% endif %}
     <button type="submit">Submit</button>
 </form>

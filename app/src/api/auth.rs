@@ -55,24 +55,24 @@ impl Default for SignupFormValues<'_> {
 }
 
 struct SignupFormErrors<'a> {
-    email: Vec<&'a str>,
-    password: Vec<&'a str>,
-    confirm_password: Vec<&'a str>,
+    email: Option<&'a str>,
+    password: Option<&'a str>,
+    confirm_password: Option<&'a str>,
 }
 
 impl Default for SignupFormErrors<'_> {
     fn default() -> Self {
         Self {
-            email: vec![],
-            password: vec![],
-            confirm_password: vec![],
+            email: None,
+            password: None,
+            confirm_password: None,
         }
     }
 }
 
 impl SignupFormErrors<'_> {
     fn has_errors(&self) -> bool {
-        !self.email.is_empty() || !self.password.is_empty() || !self.confirm_password.is_empty()
+        self.email.is_some() || self.password.is_some() || self.confirm_password.is_some()
     }
 }
 
@@ -125,7 +125,7 @@ async fn post_signup(
             SignupError::UserEmailAlreadyExistsError => {
                 let mut form_data = SignupFormData::default();
                 let mut errors = SignupFormErrors::default();
-                errors.email.push(EMAIL_IS_ALREADY_TAKEN_MESSAGE);
+                errors.email = Some(EMAIL_IS_ALREADY_TAKEN_MESSAGE);
                 form_data.errors = errors;
                 let template = SignupFormTemplate { form_data };
                 (StatusCode::CONFLICT, template).into_response()
@@ -141,38 +141,37 @@ async fn post_signup(
 fn validate_signup_request(data: &SignupRequest) -> Result<(), SignupFormData> {
     let mut focus = SignupFormField::Email;
     let mut errors = SignupFormErrors::default();
+
     if data.confirm_password.is_empty() {
-        errors.confirm_password.push(FIELD_REQUIRED_MESSAGE);
+        errors.confirm_password = Some(FIELD_REQUIRED_MESSAGE);
+        focus = SignupFormField::ConfirmPassword;
+    } else if data.password != data.confirm_password {
+        errors.confirm_password = Some(PASSWORD_MISMATCH_MESSAGE);
         focus = SignupFormField::ConfirmPassword;
     }
-    if !data.confirm_password.is_empty() && data.password != data.confirm_password {
-        errors.confirm_password.push(PASSWORD_MISMATCH_MESSAGE);
-        focus = SignupFormField::ConfirmPassword;
-    }
+
     if data.password.is_empty() {
-        errors.password.push(FIELD_REQUIRED_MESSAGE);
+        errors.password = Some(FIELD_REQUIRED_MESSAGE);
+        focus = SignupFormField::Password;
+    } else if data.password.len() < PASSWORD_MIN_LENGTH {
+        errors.password = Some(PASSWORD_TOO_SHORT_MESSAGE);
+        focus = SignupFormField::Password;
+    } else if data.password.len() > PASSWORD_MAX_LENGTH {
+        errors.password = Some(PASSWORD_TOO_LONG_MESSAGE);
         focus = SignupFormField::Password;
     }
-    if !data.password.is_empty() && data.password.len() < PASSWORD_MIN_LENGTH {
-        errors.password.push(PASSWORD_TOO_SHORT_MESSAGE);
-        focus = SignupFormField::Password;
-    }
-    if data.password.len() > PASSWORD_MAX_LENGTH {
-        errors.password.push(PASSWORD_TOO_LONG_MESSAGE);
-        focus = SignupFormField::Password;
-    }
+
     if data.email.is_empty() {
-        errors.email.push(FIELD_REQUIRED_MESSAGE);
+        errors.email = Some(FIELD_REQUIRED_MESSAGE);
+        focus = SignupFormField::Email;
+    } else if data.email.len() > EMAIL_MAX_LENGTH {
+        errors.email = Some(EMAIL_TOO_LONG_MESSAGE);
+        focus = SignupFormField::Email;
+    } else if !is_valid_email(&data.email) {
+        errors.email = Some(INVALID_EMAIL_MESSAGE);
         focus = SignupFormField::Email;
     }
-    if data.email.len() > EMAIL_MAX_LENGTH {
-        errors.email.push(EMAIL_TOO_LONG_MESSAGE);
-        focus = SignupFormField::Email;
-    }
-    if !data.email.is_empty() && !is_valid_email(&data.email) {
-        errors.email.push(INVALID_EMAIL_MESSAGE);
-        focus = SignupFormField::Email;
-    }
+
     if !errors.has_errors() {
         return Ok(());
     }
