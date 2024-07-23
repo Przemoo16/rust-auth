@@ -1,5 +1,5 @@
 use crate::db::connection::Database;
-use sqlx::{query_as, Error as SqlxError};
+use sqlx::{query, query_as, Error as SqlxError};
 use std::error::Error;
 use std::fmt::{Display, Formatter, Result as FormatResult};
 
@@ -39,8 +39,7 @@ pub struct CreateUserData<'a> {
 }
 
 pub async fn create_user(data: CreateUserData<'_>, db: &Database) -> Result<(), CreateUserError> {
-    query_as!(
-        User,
+    query!(
         "INSERT INTO users (email, password) VALUES ($1, $2)",
         data.email,
         data.password
