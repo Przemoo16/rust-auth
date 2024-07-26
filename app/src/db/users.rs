@@ -1,5 +1,5 @@
 use crate::db::connection::Database;
-use sqlx::{query, query_as, Error as SqlxError};
+use sqlx::{query, Error as SqlxError};
 use std::error::Error;
 use std::fmt::{Display, Formatter, Result as FormatResult};
 
