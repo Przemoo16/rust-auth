@@ -4,6 +4,7 @@ use crate::constants::auth::{
     FIELD_REQUIRED_MESSAGE, INVALID_EMAIL_MESSAGE, PASSWORD_MAX_LENGTH, PASSWORD_MIN_LENGTH,
     PASSWORD_MISMATCH_MESSAGE, PASSWORD_TOO_LONG_MESSAGE, PASSWORD_TOO_SHORT_MESSAGE,
 };
+use crate::libs::auth::AuthSession;
 use crate::libs::validation::is_valid_email;
 use crate::operations::auth::{signup, SignupData, SignupError};
 use crate::state::AppState;
@@ -84,6 +85,7 @@ struct SignupRequest {
 
 async fn post_signup(
     State(state): State<AppState>,
+    mut auth_session: AuthSession,
     Form(data): Form<SignupRequest>,
 ) -> impl IntoResponse {
     if let Err(form_data) = validate_signup_request(&data) {
@@ -96,10 +98,11 @@ async fn post_signup(
             password: data.password,
         },
         &state.db,
+        &mut auth_session,
     )
     .await
     {
-        Ok(_) => StatusCode::CREATED.into_response(),
+        Ok(_) => StatusCode::CREATED.into_response(), // TODO: Redirect
         Err(e) => match e {
             SignupError::UserEmailAlreadyExistsError => {
                 let mut errors = SignupFormErrors::default();

@@ -1,5 +1,6 @@
 use crate::db::connection::Database;
 use crate::db::user::{create_user, CreateUserData, CreateUserError};
+use crate::libs::auth::{AuthError, AuthSession};
 use crate::libs::password::{hash_password_in_separate_thread, HashPasswordError};
 use std::error::Error;
 use std::fmt::{Display, Formatter, Result as FormatResult};
@@ -9,6 +10,7 @@ pub enum SignupError {
     HashPasswordError(HashPasswordError),
     UserEmailAlreadyExistsError,
     CreateUserError(CreateUserError),
+    LoginError(AuthError),
 }
 
 impl Error for SignupError {}
@@ -28,12 +30,19 @@ impl From<CreateUserError> for SignupError {
     }
 }
 
+impl From<AuthError> for SignupError {
+    fn from(value: AuthError) -> Self {
+        SignupError::LoginError(value)
+    }
+}
+
 impl Display for SignupError {
     fn fmt(&self, f: &mut Formatter<'_>) -> FormatResult {
         match self {
             SignupError::HashPasswordError(e) => write!(f, "Hash password error: {}", e),
             SignupError::UserEmailAlreadyExistsError => write!(f, "User email already exists"),
             SignupError::CreateUserError(e) => write!(f, "Create user error: {}", e),
+            SignupError::LoginError(e) => write!(f, "Login error: {}", e),
         }
     }
 }
@@ -43,9 +52,13 @@ pub struct SignupData<'a> {
     pub password: String,
 }
 
-pub async fn signup(data: SignupData<'_>, db: &Database) -> Result<(), SignupError> {
+pub async fn signup(
+    data: SignupData<'_>,
+    db: &Database,
+    auth_session: &mut AuthSession,
+) -> Result<(), SignupError> {
     let hashed_password = hash_password_in_separate_thread(data.password).await?;
-    create_user(
+    let user = create_user(
         CreateUserData {
             email: data.email,
             password: &hashed_password,
@@ -53,6 +66,6 @@ pub async fn signup(data: SignupData<'_>, db: &Database) -> Result<(), SignupErr
         db,
     )
     .await?;
-    // TODO: Login here
+    auth_session.login(&user).await?;
     Ok(())
 }

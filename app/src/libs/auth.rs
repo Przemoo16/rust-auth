@@ -1,50 +1,118 @@
+use crate::db::{
+    connection::Database,
+    user::{get_user_by_email, get_user_by_id, GetUserError, User},
+};
 use async_trait::async_trait;
-use axum_login::{AuthUser, AuthnBackend, UserId};
+use axum_login::{
+    AuthSession as BaseAuthSession, AuthUser, AuthnBackend, Error as BaseError, UserId,
+};
+use std::error::Error;
+use std::fmt::{Display, Formatter, Result as FormatResult};
+
+use crate::libs::password::{
+    hash_password_in_separate_thread, verify_password_in_separate_thread, HashPasswordError,
+    VerifyPasswordError,
+};
 
 #[derive(Clone)]
-pub struct Backend {}
+pub struct Backend {
+    db: Database,
+}
 
 impl Backend {
-    pub fn new() -> Self {
-        Self {}
+    pub fn new(db: Database) -> Self {
+        Self { db }
     }
 }
 
-pub struct Credentials {
-    user_id: i64,
-}
-
-#[derive(Clone, Debug)]
-pub struct User {
-    id: i64,
-}
-
 impl AuthUser for User {
-    type Id = i64;
+    type Id = i32;
 
     fn id(&self) -> Self::Id {
         self.id
     }
 
     fn session_auth_hash(&self) -> &[u8] {
-        "foo".as_bytes()
+        // Use the password hash as the auth hash, so when user changes their
+        // password the auth session becomes invalid.
+        self.password.as_bytes()
     }
+}
+
+#[derive(Debug)]
+pub enum AuthenticationError {
+    GetUserError(GetUserError),
+    VerifyPasswordError(VerifyPasswordError),
+    HashPasswordError(HashPasswordError),
+}
+
+impl Error for AuthenticationError {}
+
+impl From<GetUserError> for AuthenticationError {
+    fn from(value: GetUserError) -> Self {
+        AuthenticationError::GetUserError(value)
+    }
+}
+
+impl From<VerifyPasswordError> for AuthenticationError {
+    fn from(value: VerifyPasswordError) -> Self {
+        AuthenticationError::VerifyPasswordError(value)
+    }
+}
+
+impl From<HashPasswordError> for AuthenticationError {
+    fn from(value: HashPasswordError) -> Self {
+        AuthenticationError::HashPasswordError(value)
+    }
+}
+
+impl Display for AuthenticationError {
+    fn fmt(&self, f: &mut Formatter<'_>) -> FormatResult {
+        match self {
+            AuthenticationError::GetUserError(e) => {
+                write!(f, "Get user error: {}", e)
+            }
+            AuthenticationError::VerifyPasswordError(e) => {
+                write!(f, "Verify password error: {}", e)
+            }
+            AuthenticationError::HashPasswordError(e) => {
+                write!(f, "Hash password error: {}", e)
+            }
+        }
+    }
+}
+
+pub struct Credentials {
+    email: String,
+    password: String,
 }
 
 #[async_trait]
 impl AuthnBackend for Backend {
     type User = User;
     type Credentials = Credentials;
-    type Error = std::convert::Infallible;
+    type Error = AuthenticationError;
 
     async fn authenticate(
         &self,
-        Credentials { user_id: _ }: Self::Credentials,
+        creds: Self::Credentials,
     ) -> Result<Option<Self::User>, Self::Error> {
-        Ok(Some(User { id: 1 }))
+        if let Some(user) = get_user_by_email(&creds.email, &self.db).await? {
+            if verify_password_in_separate_thread(creds.password, user.password.clone()).await? {
+                return Ok(Some(user));
+            }
+        } else {
+            // Run the password hasher to mitigate timing attack
+            hash_password_in_separate_thread(creds.password).await?;
+        }
+        Ok(None)
     }
 
-    async fn get_user(&self, _user_id: &UserId<Self>) -> Result<Option<Self::User>, Self::Error> {
-        Ok(Some(User { id: 1 }))
+    async fn get_user(&self, user_id: &UserId<Self>) -> Result<Option<Self::User>, Self::Error> {
+        let user = get_user_by_id(user_id, &self.db).await?;
+        Ok(user)
     }
 }
+
+pub type AuthSession = BaseAuthSession<Backend>;
+pub type AuthError = BaseError<Backend>;

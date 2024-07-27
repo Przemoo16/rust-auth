@@ -1,7 +1,22 @@
 use crate::db::connection::Database;
-use sqlx::{query, query_as, Error as SqlxError};
+use sqlx::{query_as, Error as SqlxError};
 use std::error::Error;
-use std::fmt::{Display, Formatter, Result as FormatResult};
+use std::fmt::{Debug as FormatDebug, Display, Formatter, Result as FormatResult};
+
+#[derive(Clone)]
+pub struct User {
+    pub id: i32,
+    pub password: String,
+}
+
+impl FormatDebug for User {
+    fn fmt(&self, f: &mut Formatter<'_>) -> FormatResult {
+        f.debug_struct("User")
+            .field("id", &self.id)
+            .field("password", &"********")
+            .finish()
+    }
+}
 
 #[derive(Debug)]
 pub enum CreateUserError {
@@ -38,21 +53,16 @@ pub struct CreateUserData<'a> {
     pub password: &'a str,
 }
 
-pub async fn create_user(data: CreateUserData<'_>, db: &Database) -> Result<(), CreateUserError> {
-    query!(
-        "INSERT INTO users (email, password) VALUES ($1, $2)",
+pub async fn create_user(data: CreateUserData<'_>, db: &Database) -> Result<User, CreateUserError> {
+    let user = query_as!(
+        User,
+        "INSERT INTO users (email, password) VALUES ($1, $2) RETURNING id, password",
         data.email,
-        data.password
+        data.password,
     )
-    .execute(db)
+    .fetch_one(db)
     .await?;
-    Ok(())
-}
-
-#[derive(Debug, Clone)]
-pub struct User {
-    pub id: i32,
-    pub password: String,
+    Ok(user)
 }
 
 #[derive(Debug)]

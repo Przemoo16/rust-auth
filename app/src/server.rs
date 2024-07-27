@@ -22,6 +22,7 @@ pub struct ServerConfig {
 pub async fn run_server(config: ServerConfig) {
     let auth_layer = create_auth_layer(
         config.session_store.clone(),
+        config.db.clone(),
         &config.app_config.auth.secret_key,
         Duration::minutes(config.app_config.auth.session_expiration_minutes),
     );
