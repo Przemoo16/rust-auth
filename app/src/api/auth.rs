@@ -156,9 +156,9 @@ fn validate_signup_request(data: &SignupRequest) -> Result<(), SignupFormData> {
     if !errors.has_errors() {
         return Ok(());
     }
-    return Err(SignupFormData {
+    Err(SignupFormData {
         focus,
         values: SignupFormValues { email: &data.email },
         errors,
-    });
+    })
 }
