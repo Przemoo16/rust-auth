@@ -1,4 +1,4 @@
 pub mod auth;
-pub mod layers;
+pub mod layer;
 pub mod main;
-pub mod middlewares;
+pub mod middleware;

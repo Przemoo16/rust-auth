@@ -1,4 +1,4 @@
-use crate::api::middlewares::RenderOptions;
+use crate::api::middleware::RenderOptions;
 use crate::constants::auth::{
     EMAIL_IS_ALREADY_TAKEN_MESSAGE, EMAIL_MAX_LENGTH, EMAIL_TOO_LONG_MESSAGE,
     FIELD_REQUIRED_MESSAGE, INVALID_EMAIL_MESSAGE, PASSWORD_MAX_LENGTH, PASSWORD_MIN_LENGTH,

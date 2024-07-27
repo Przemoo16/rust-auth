@@ -38,14 +38,14 @@ impl Display for HashPasswordError {
 pub async fn hash_password_in_separate_thread(
     password: String,
 ) -> Result<String, HashPasswordError> {
-    let hashed_password = spawn_blocking(move || hash_password(&password)).await??;
+    let hashed_password = spawn_blocking(move || hash_password(&password.into_bytes())).await??;
     Ok(hashed_password)
 }
 
-fn hash_password(password: &str) -> Result<String, Argon2Error> {
+fn hash_password(password: &[u8]) -> Result<String, Argon2Error> {
     let salt = SaltString::generate(&mut OsRng);
     let hashed_password = Argon2::default()
-        .hash_password(password.as_bytes(), &salt)?
+        .hash_password(password, &salt)?
         .to_string();
     Ok(hashed_password)
 }

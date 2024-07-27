@@ -1,7 +1,7 @@
 use crate::api::auth::create_auth_router;
-use crate::api::layers::create_auth_layer;
+use crate::api::layer::create_auth_layer;
 use crate::api::main::create_main_router;
-use crate::api::middlewares::set_render_options;
+use crate::api::middleware::set_render_options;
 use crate::config::Config;
 use crate::db::connection::{Database, SessionStore};
 use crate::libs::signal::shutdown_signal;

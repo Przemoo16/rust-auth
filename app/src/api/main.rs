@@ -1,4 +1,4 @@
-use crate::api::middlewares::RenderOptions;
+use crate::api::middleware::RenderOptions;
 use crate::state::AppState;
 use askama_axum::Template;
 use axum::{extract::Extension, routing::get, Router};

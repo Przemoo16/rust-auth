@@ -1,7 +1,12 @@
+use base64::{engine::general_purpose::STANDARD, Engine as _};
 use std::env::var;
 
 fn read_env(key: &str) -> String {
     var(key).expect(&format!("Couldn't read the {} env variable", key))
+}
+
+fn decode_base64(string: &str) -> Vec<u8> {
+    STANDARD.decode(string).expect("Invalid base64 string")
 }
 
 pub struct Config {
@@ -19,7 +24,7 @@ impl Config {
 }
 
 pub struct AuthConfig {
-    pub secret_key: String,
+    pub secret_key: Vec<u8>,
     pub session_expiration_minutes: i64,
     pub delete_expired_sessions_interval_seconds: u64,
 }
@@ -27,7 +32,7 @@ pub struct AuthConfig {
 impl AuthConfig {
     pub fn from_env() -> Self {
         Self {
-            secret_key: read_env("AUTH_SECRET_KEY"),
+            secret_key: decode_base64(&read_env("AUTH_SECRET_KEY")),
             session_expiration_minutes: read_env("AUTH_SESSION_EXPIRATION_MINUTES")
                 .parse()
                 .expect("AUTH_SESSION_EXPIRATION_MINUTES must be a number"),
