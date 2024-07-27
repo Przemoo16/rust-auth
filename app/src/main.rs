@@ -1,15 +1,20 @@
 use app::config::Config;
-use app::db::connection::{create_db_pool, run_migrations};
-use app::server::run_server;
+use app::db::connection::{setup_db_pool, setup_session_store};
+use app::server::{run_server, ServerConfig};
 use app::tracing::setup_tracing;
 use dotenv::dotenv;
 
 #[tokio::main]
 async fn main() {
     dotenv().ok();
-    let config = Config::from_env();
+    let app_config = Config::from_env();
     setup_tracing();
-    let db_pool = create_db_pool(&config.database_url, config.database_pool_max_connections).await;
-    run_migrations(&db_pool).await;
-    run_server(db_pool).await;
+    let db = setup_db_pool(&app_config.db.url, app_config.db.pool_max_connections).await;
+    let session_store = setup_session_store(db.clone()).await;
+    run_server(ServerConfig {
+        db,
+        session_store,
+        app_config,
+    })
+    .await;
 }

@@ -1,6 +1,6 @@
 use crate::db::connection::Database;
 use crate::db::users::{create_user, CreateUserData, CreateUserError};
-use crate::libs::auth::{hash_password_in_separate_thread, HashPasswordError};
+use crate::libs::password::{hash_password_in_separate_thread, HashPasswordError};
 use std::error::Error;
 use std::fmt::{Display, Formatter, Result as FormatResult};
 
