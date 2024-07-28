@@ -1,6 +1,9 @@
 {% extends "layout.html" %}
 
 {% block content %}
-<a hx-get="/signup" hx-target="#main" hx-push-url="true">Sign up</a>
+{% if is_authenticated %}
 <a hx-post="/logout" hx-target="#main" hx-push-url="true">Logout</a>
+{% else %}
+<a hx-get="/signup" hx-target="#main" hx-push-url="true">Sign up</a>
+{% endif %}
 {% endblock content %}
