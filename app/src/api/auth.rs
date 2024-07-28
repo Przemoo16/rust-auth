@@ -6,21 +6,23 @@ use crate::constants::auth::{
 };
 use crate::libs::auth::AuthSession;
 use crate::libs::validation::is_valid_email;
-use crate::operations::auth::{signup, SignupData, SignupError};
+use crate::operations::auth::{logout, signup, SignupData, SignupError};
 use crate::state::AppState;
 use askama_axum::Template;
 use axum::{
     extract::{Extension, State},
     http::StatusCode,
     response::IntoResponse,
-    routing::get,
+    routing::{get, post},
     Form, Router,
 };
 use serde::Deserialize;
 use tracing::error;
 
 pub fn create_auth_router() -> Router<AppState> {
-    Router::new().route("/signup", get(get_signup).post(post_signup))
+    Router::new()
+        .route("/signup", get(get_signup).post(post_signup))
+        .route("/logout", post(post_logout))
 }
 
 #[derive(Template)]
@@ -164,4 +166,14 @@ fn validate_signup_request(data: &SignupRequest) -> Result<(), SignupFormData> {
         values: SignupFormValues { email: &data.email },
         errors,
     })
+}
+
+async fn post_logout(mut auth_session: AuthSession) -> impl IntoResponse {
+    match logout(&mut auth_session).await {
+        Ok(_) => StatusCode::OK.into_response(), // TODO: Redirect
+        Err(e) => {
+            error!("Failed to logout: {:?}", e);
+            StatusCode::INTERNAL_SERVER_ERROR.into_response()
+        }
+    }
 }

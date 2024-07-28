@@ -66,25 +66,19 @@ pub async fn create_user(data: CreateUserData<'_>, db: &Database) -> Result<User
 }
 
 #[derive(Debug)]
-pub enum GetUserError {
-    DatabaseError(SqlxError),
-}
+pub struct GetUserError(SqlxError);
 
 impl Error for GetUserError {}
 
 impl Display for GetUserError {
     fn fmt(&self, f: &mut Formatter<'_>) -> FormatResult {
-        match self {
-            GetUserError::DatabaseError(e) => {
-                write!(f, "Database error: {}", e)
-            }
-        }
+        write!(f, "Database error: {}", self.0)
     }
 }
 
 impl From<SqlxError> for GetUserError {
     fn from(value: SqlxError) -> Self {
-        GetUserError::DatabaseError(value)
+        GetUserError(value)
     }
 }
 

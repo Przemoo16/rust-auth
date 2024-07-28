@@ -69,3 +69,25 @@ pub async fn signup(
     auth_session.login(&user).await?;
     Ok(())
 }
+
+#[derive(Debug)]
+pub struct LogoutError(AuthError);
+
+impl Error for LogoutError {}
+
+impl Display for LogoutError {
+    fn fmt(&self, f: &mut Formatter<'_>) -> FormatResult {
+        write!(f, "Logout error: {}", self.0)
+    }
+}
+
+impl From<AuthError> for LogoutError {
+    fn from(value: AuthError) -> Self {
+        LogoutError(value)
+    }
+}
+
+pub async fn logout(auth_session: &mut AuthSession) -> Result<(), LogoutError> {
+    auth_session.logout().await?;
+    Ok(())
+}
