@@ -5,5 +5,7 @@
 {% block content %}
 <h1>Sign up</h1>
 {% include "form.html" %}
-<a hx-get="/" hx-target="#main" hx-push-url="true">Home</a>
+<a hx-get="/signin" hx-target="#main" hx-push-url="true">
+    Already have an account?
+</a>
 {% endblock %}
