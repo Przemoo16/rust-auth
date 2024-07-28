@@ -5,6 +5,11 @@ use crate::libs::password::{hash_password_in_separate_thread, HashPasswordError}
 use std::error::Error;
 use std::fmt::{Display, Formatter, Result as FormatResult};
 
+pub struct SignupData<'a> {
+    pub email: &'a str,
+    pub password: String,
+}
+
 #[derive(Debug)]
 pub enum SignupError {
     HashPasswordError(HashPasswordError),
@@ -14,6 +19,17 @@ pub enum SignupError {
 }
 
 impl Error for SignupError {}
+
+impl Display for SignupError {
+    fn fmt(&self, f: &mut Formatter<'_>) -> FormatResult {
+        match self {
+            SignupError::HashPasswordError(e) => write!(f, "Hash password error: {}", e),
+            SignupError::UserEmailAlreadyExistsError => write!(f, "User email already exists"),
+            SignupError::CreateUserError(e) => write!(f, "Create user error: {}", e),
+            SignupError::LoginError(e) => write!(f, "Login error: {}", e),
+        }
+    }
+}
 
 impl From<HashPasswordError> for SignupError {
     fn from(value: HashPasswordError) -> Self {
@@ -34,22 +50,6 @@ impl From<AuthError> for SignupError {
     fn from(value: AuthError) -> Self {
         SignupError::LoginError(value)
     }
-}
-
-impl Display for SignupError {
-    fn fmt(&self, f: &mut Formatter<'_>) -> FormatResult {
-        match self {
-            SignupError::HashPasswordError(e) => write!(f, "Hash password error: {}", e),
-            SignupError::UserEmailAlreadyExistsError => write!(f, "User email already exists"),
-            SignupError::CreateUserError(e) => write!(f, "Create user error: {}", e),
-            SignupError::LoginError(e) => write!(f, "Login error: {}", e),
-        }
-    }
-}
-
-pub struct SignupData<'a> {
-    pub email: &'a str,
-    pub password: String,
 }
 
 pub async fn signup(

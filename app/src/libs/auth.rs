@@ -48,6 +48,22 @@ pub enum AuthenticationError {
 
 impl Error for AuthenticationError {}
 
+impl Display for AuthenticationError {
+    fn fmt(&self, f: &mut Formatter<'_>) -> FormatResult {
+        match self {
+            AuthenticationError::GetUserError(e) => {
+                write!(f, "Get user error: {}", e)
+            }
+            AuthenticationError::VerifyPasswordError(e) => {
+                write!(f, "Verify password error: {}", e)
+            }
+            AuthenticationError::HashPasswordError(e) => {
+                write!(f, "Hash password error: {}", e)
+            }
+        }
+    }
+}
+
 impl From<GetUserError> for AuthenticationError {
     fn from(value: GetUserError) -> Self {
         AuthenticationError::GetUserError(value)
@@ -63,22 +79,6 @@ impl From<VerifyPasswordError> for AuthenticationError {
 impl From<HashPasswordError> for AuthenticationError {
     fn from(value: HashPasswordError) -> Self {
         AuthenticationError::HashPasswordError(value)
-    }
-}
-
-impl Display for AuthenticationError {
-    fn fmt(&self, f: &mut Formatter<'_>) -> FormatResult {
-        match self {
-            AuthenticationError::GetUserError(e) => {
-                write!(f, "Get user error: {}", e)
-            }
-            AuthenticationError::VerifyPasswordError(e) => {
-                write!(f, "Verify password error: {}", e)
-            }
-            AuthenticationError::HashPasswordError(e) => {
-                write!(f, "Hash password error: {}", e)
-            }
-        }
     }
 }
 

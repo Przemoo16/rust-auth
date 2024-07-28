@@ -23,6 +23,13 @@ pub fn create_auth_router() -> Router<AppState> {
     Router::new().route("/signup", get(get_signup).post(post_signup))
 }
 
+#[derive(Template)]
+#[template(path = "signup/index.html")]
+struct SignupTemplate<'a> {
+    options: RenderOptions,
+    form_data: SignupFormData<'a>,
+}
+
 #[derive(Default)]
 struct SignupFormData<'a> {
     focus: SignupFormField,
@@ -56,19 +63,6 @@ impl SignupFormErrors<'_> {
     }
 }
 
-#[derive(Template)]
-#[template(path = "signup/index.html")]
-struct SignupTemplate<'a> {
-    options: RenderOptions,
-    form_data: SignupFormData<'a>,
-}
-
-#[derive(Template)]
-#[template(path = "signup/form.html")]
-struct SignupFormTemplate<'a> {
-    form_data: SignupFormData<'a>,
-}
-
 async fn get_signup(Extension(options): Extension<RenderOptions>) -> SignupTemplate<'static> {
     SignupTemplate {
         options,
@@ -81,6 +75,12 @@ struct SignupRequest {
     email: String,
     password: String,
     confirm_password: String,
+}
+
+#[derive(Template)]
+#[template(path = "signup/form.html")]
+struct SignupFormTemplate<'a> {
+    form_data: SignupFormData<'a>,
 }
 
 async fn post_signup(

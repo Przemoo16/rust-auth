@@ -17,6 +17,15 @@ pub enum HashPasswordError {
 
 impl Error for HashPasswordError {}
 
+impl Display for HashPasswordError {
+    fn fmt(&self, f: &mut Formatter<'_>) -> FormatResult {
+        match self {
+            HashPasswordError::ThreadError(e) => write!(f, "Thread error: {}", e),
+            HashPasswordError::HashError(e) => write!(f, "Hash error: {}", e),
+        }
+    }
+}
+
 impl From<JoinError> for HashPasswordError {
     fn from(value: JoinError) -> Self {
         HashPasswordError::ThreadError(value)
@@ -26,15 +35,6 @@ impl From<JoinError> for HashPasswordError {
 impl From<Argon2Error> for HashPasswordError {
     fn from(value: Argon2Error) -> Self {
         HashPasswordError::HashError(value)
-    }
-}
-
-impl Display for HashPasswordError {
-    fn fmt(&self, f: &mut Formatter<'_>) -> FormatResult {
-        match self {
-            HashPasswordError::ThreadError(e) => write!(f, "Thread error: {}", e),
-            HashPasswordError::HashError(e) => write!(f, "Hash error: {}", e),
-        }
     }
 }
 
@@ -61,6 +61,15 @@ pub enum VerifyPasswordError {
 
 impl Error for VerifyPasswordError {}
 
+impl Display for VerifyPasswordError {
+    fn fmt(&self, f: &mut Formatter<'_>) -> FormatResult {
+        match self {
+            VerifyPasswordError::ThreadError(e) => write!(f, "Thread error: {}", e),
+            VerifyPasswordError::HashError(e) => write!(f, "Hash error: {}", e),
+        }
+    }
+}
+
 impl From<JoinError> for VerifyPasswordError {
     fn from(value: JoinError) -> Self {
         VerifyPasswordError::ThreadError(value)
@@ -70,15 +79,6 @@ impl From<JoinError> for VerifyPasswordError {
 impl From<Argon2Error> for VerifyPasswordError {
     fn from(value: Argon2Error) -> Self {
         VerifyPasswordError::HashError(value)
-    }
-}
-
-impl Display for VerifyPasswordError {
-    fn fmt(&self, f: &mut Formatter<'_>) -> FormatResult {
-        match self {
-            VerifyPasswordError::ThreadError(e) => write!(f, "Thread error: {}", e),
-            VerifyPasswordError::HashError(e) => write!(f, "Hash error: {}", e),
-        }
     }
 }
 

@@ -18,6 +18,11 @@ impl FormatDebug for User {
     }
 }
 
+pub struct CreateUserData<'a> {
+    pub email: &'a str,
+    pub password: &'a str,
+}
+
 #[derive(Debug)]
 pub enum CreateUserError {
     EmailAlreadyExistsError,
@@ -25,15 +30,6 @@ pub enum CreateUserError {
 }
 
 impl Error for CreateUserError {}
-
-impl From<SqlxError> for CreateUserError {
-    fn from(value: SqlxError) -> Self {
-        match value.as_database_error() {
-            Some(e) if e.is_unique_violation() => CreateUserError::EmailAlreadyExistsError,
-            _ => CreateUserError::DatabaseError(value),
-        }
-    }
-}
 
 impl Display for CreateUserError {
     fn fmt(&self, f: &mut Formatter<'_>) -> FormatResult {
@@ -48,9 +44,13 @@ impl Display for CreateUserError {
     }
 }
 
-pub struct CreateUserData<'a> {
-    pub email: &'a str,
-    pub password: &'a str,
+impl From<SqlxError> for CreateUserError {
+    fn from(value: SqlxError) -> Self {
+        match value.as_database_error() {
+            Some(e) if e.is_unique_violation() => CreateUserError::EmailAlreadyExistsError,
+            _ => CreateUserError::DatabaseError(value),
+        }
+    }
 }
 
 pub async fn create_user(data: CreateUserData<'_>, db: &Database) -> Result<User, CreateUserError> {
@@ -72,12 +72,6 @@ pub enum GetUserError {
 
 impl Error for GetUserError {}
 
-impl From<SqlxError> for GetUserError {
-    fn from(value: SqlxError) -> Self {
-        GetUserError::DatabaseError(value)
-    }
-}
-
 impl Display for GetUserError {
     fn fmt(&self, f: &mut Formatter<'_>) -> FormatResult {
         match self {
@@ -85,6 +79,12 @@ impl Display for GetUserError {
                 write!(f, "Database error: {}", e)
             }
         }
+    }
+}
+
+impl From<SqlxError> for GetUserError {
+    fn from(value: SqlxError) -> Self {
+        GetUserError::DatabaseError(value)
     }
 }
 

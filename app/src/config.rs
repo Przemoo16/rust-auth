@@ -1,14 +1,6 @@
 use base64::{engine::general_purpose::STANDARD, Engine as _};
 use std::env::var;
 
-fn read_env(key: &str) -> String {
-    var(key).expect(&format!("Couldn't read the {} env variable", key))
-}
-
-fn decode_base64(string: &str) -> Vec<u8> {
-    STANDARD.decode(string).expect("Invalid base64 string")
-}
-
 pub struct Config {
     pub auth: AuthConfig,
     pub db: DatabaseConfig,
@@ -59,4 +51,12 @@ impl DatabaseConfig {
                 .expect("DATABASE_POOL_MAX_CONNECTIONS must be a number"),
         }
     }
+}
+
+fn read_env(key: &str) -> String {
+    var(key).expect(&format!("Couldn't read the {} env variable", key))
+}
+
+fn decode_base64(string: &str) -> Vec<u8> {
+    STANDARD.decode(string).expect("Invalid base64 string")
 }
