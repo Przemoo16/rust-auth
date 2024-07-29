@@ -2,7 +2,7 @@
 
 {% block content %}
 {% if is_authenticated %}
-<a hx-post="/logout" hx-target="#main" hx-push-url="true">Logout</a>
+<a hx-post="/logout" hx-target="#main" hx-push-url="true">Log out</a>
 {% else %}
 <a hx-get="/signin" hx-target="#main" hx-push-url="true">Sign in</a>
 <a hx-get="/signup" hx-target="#main" hx-push-url="true">Sign up</a>

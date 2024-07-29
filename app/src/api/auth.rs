@@ -8,7 +8,7 @@ use crate::constants::auth::{
 use crate::libs::auth::AuthSession;
 use crate::libs::validation::is_valid_email;
 use crate::operations::auth::{
-    logout, signin, signup, SigninData, SigninError, SignupData, SignupError,
+    log_out, sign_in, sign_up, SigninData, SigninError, SignupData, SignupError,
 };
 use crate::state::AppState;
 use askama_axum::Template;
@@ -98,7 +98,7 @@ async fn post_signup(
         let template = SignupFormTemplate { form_data };
         return (StatusCode::UNPROCESSABLE_ENTITY, template).into_response();
     }
-    match signup(
+    match sign_up(
         SignupData {
             email: &data.email,
             password: data.password,
@@ -121,7 +121,7 @@ async fn post_signup(
                 (StatusCode::CONFLICT, template).into_response()
             }
             _ => {
-                error!("Failed to signup: {:?}", e);
+                error!("Failed to sign up: {:?}", e);
                 StatusCode::INTERNAL_SERVER_ERROR.into_response()
             }
         },
@@ -240,7 +240,7 @@ async fn post_signin(
         return (StatusCode::UNPROCESSABLE_ENTITY, template).into_response();
     }
 
-    match signin(
+    match sign_in(
         SigninData {
             email: data.email,
             password: data.password,
@@ -262,7 +262,7 @@ async fn post_signin(
                 (StatusCode::UNAUTHORIZED, template).into_response()
             }
             _ => {
-                error!("Failed to signin: {:?}", e);
+                error!("Failed to sign in: {:?}", e);
                 StatusCode::INTERNAL_SERVER_ERROR.into_response()
             }
         },
@@ -297,10 +297,10 @@ fn validate_signin_request(data: &SigninRequest) -> Result<(), SigninFormData> {
 }
 
 async fn post_logout(mut auth_session: AuthSession) -> impl IntoResponse {
-    match logout(&mut auth_session).await {
+    match log_out(&mut auth_session).await {
         Ok(_) => StatusCode::OK.into_response(), // TODO: Redirect
         Err(e) => {
-            error!("Failed to logout: {:?}", e);
+            error!("Failed to log out: {:?}", e);
             StatusCode::INTERNAL_SERVER_ERROR.into_response()
         }
     }

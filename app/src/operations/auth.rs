@@ -52,7 +52,7 @@ impl From<AuthError> for SignupError {
     }
 }
 
-pub async fn signup(
+pub async fn sign_up(
     data: SignupData<'_>,
     db: &Database,
     auth_session: &mut AuthSession,
@@ -98,7 +98,7 @@ impl From<AuthError> for SigninError {
     }
 }
 
-pub async fn signin(data: SigninData, auth_session: &mut AuthSession) -> Result<(), SigninError> {
+pub async fn sign_in(data: SigninData, auth_session: &mut AuthSession) -> Result<(), SigninError> {
     let user = auth_session
         .authenticate(Credentials {
             email: data.email,
@@ -127,7 +127,7 @@ impl From<AuthError> for LogoutError {
     }
 }
 
-pub async fn logout(auth_session: &mut AuthSession) -> Result<(), LogoutError> {
+pub async fn log_out(auth_session: &mut AuthSession) -> Result<(), LogoutError> {
     auth_session.logout().await?;
     Ok(())
 }
