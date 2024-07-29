@@ -180,7 +180,7 @@ fn validate_signup_request(data: &SignupRequest) -> Result<(), SignupFormData> {
 }
 
 #[derive(Deserialize)]
-struct SigninQueryParams {
+struct SigninParams {
     next: Option<String>,
 }
 
@@ -208,7 +208,7 @@ enum SigninFormField {
 #[derive(Default)]
 struct SigninFormValues<'a> {
     email: Option<&'a str>,
-    next: Option<String>,
+    next: Option<&'a str>,
 }
 
 #[derive(Default)]
@@ -226,18 +226,19 @@ impl SigninFormErrors<'_> {
 
 async fn get_signin(
     Extension(options): Extension<RenderOptions>,
-    Query(SigninQueryParams { next }): Query<SigninQueryParams>,
-) -> SigninTemplate<'static> {
+    params: Query<SigninParams>,
+) -> impl IntoResponse {
     SigninTemplate {
         options,
         form_data: SigninFormData {
             values: SigninFormValues {
-                next,
+                next: params.next.as_deref(),
                 ..Default::default()
             },
             ..Default::default()
         },
     }
+    .into_response()
 }
 
 #[derive(Deserialize)]
@@ -284,7 +285,7 @@ async fn post_signin(
                     form_data: SigninFormData {
                         values: SigninFormValues {
                             email: Some(&data.email),
-                            next: data.next,
+                            next: data.next.as_deref(),
                         },
                         errors: SigninFormErrors {
                             general: Some(INVALID_CREDENTIALS_MESSAGE),
@@ -327,7 +328,7 @@ fn validate_signin_request(data: &SigninRequest) -> Result<(), SigninFormData> {
         focus,
         values: SigninFormValues {
             email: Some(&data.email),
-            ..Default::default()
+            next: data.next.as_deref(),
         },
         errors,
     })
