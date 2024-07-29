@@ -112,12 +112,14 @@ async fn post_signup(
         Ok(_) => StatusCode::CREATED.into_response(), // TODO: Redirect
         Err(e) => match e {
             SignupError::UserEmailAlreadyExistsError => {
-                let errors = SignupFormErrors {
-                    email: Some(EMAIL_IS_ALREADY_TAKEN_MESSAGE),
-                    ..Default::default()
-                };
                 let form_data = SignupFormData {
-                    errors,
+                    values: SignupFormValues {
+                        email: Some(&data.email),
+                    },
+                    errors: SignupFormErrors {
+                        email: Some(EMAIL_IS_ALREADY_TAKEN_MESSAGE),
+                        ..Default::default()
+                    },
                     ..Default::default()
                 };
                 let template = SignupFormTemplate { form_data };
@@ -226,15 +228,16 @@ async fn get_signin(
     Extension(options): Extension<RenderOptions>,
     Query(SigninQueryParams { next }): Query<SigninQueryParams>,
 ) -> SigninTemplate<'static> {
-    let values = SigninFormValues {
-        next,
-        ..Default::default()
-    };
-    let form_data = SigninFormData {
-        values,
-        ..Default::default()
-    };
-    SigninTemplate { options, form_data }
+    SigninTemplate {
+        options,
+        form_data: SigninFormData {
+            values: SigninFormValues {
+                next,
+                ..Default::default()
+            },
+            ..Default::default()
+        },
+    }
 }
 
 #[derive(Deserialize)]
@@ -261,7 +264,7 @@ async fn post_signin(
 
     match sign_in(
         SigninData {
-            email: data.email,
+            email: data.email.clone(),
             password: data.password,
         },
         &mut auth_session,
@@ -277,13 +280,19 @@ async fn post_signin(
         } // TODO: Proper redirect
         Err(e) => match e {
             SigninError::InvalidCredentialsError => {
-                let mut errors = SigninFormErrors::default();
-                errors.general = Some(INVALID_CREDENTIALS_MESSAGE);
-                let form_data = SigninFormData {
-                    errors,
-                    ..Default::default()
+                let template = SigninFormTemplate {
+                    form_data: SigninFormData {
+                        values: SigninFormValues {
+                            email: Some(&data.email),
+                            next: data.next,
+                        },
+                        errors: SigninFormErrors {
+                            general: Some(INVALID_CREDENTIALS_MESSAGE),
+                            ..Default::default()
+                        },
+                        ..Default::default()
+                    },
                 };
-                let template = SigninFormTemplate { form_data };
                 (StatusCode::UNAUTHORIZED, template).into_response()
             }
             _ => {

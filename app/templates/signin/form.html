@@ -23,8 +23,8 @@
     {% if let Some(error) = form_data.errors.password %}
     <div style="color: red">{{ error }}</div>
     {% endif %}
-    {% if let Some(next) = form_data.values.next %}
-    <input type="hidden" name="next" value="{{ next }}" />
+    {% if let Some(value) = form_data.values.next %}
+    <input type="hidden" name="next" value="{{ value }}" />
     {% endif %}
     {% if let Some(error) = form_data.errors.general %}
     <div style="color: red">{{ error }}</div>
