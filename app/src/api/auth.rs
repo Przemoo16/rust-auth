@@ -12,8 +12,9 @@ use crate::operations::auth::{
 };
 use crate::state::AppState;
 use askama_axum::Template;
+use axum::response::Redirect;
 use axum::{
-    extract::{Extension, State},
+    extract::{Extension, Query, State},
     http::StatusCode,
     response::IntoResponse,
     routing::{get, post},
@@ -53,7 +54,7 @@ enum SignupFormField {
 
 #[derive(Default)]
 struct SignupFormValues<'a> {
-    email: &'a str,
+    email: Option<&'a str>,
 }
 
 #[derive(Default)]
@@ -111,8 +112,10 @@ async fn post_signup(
         Ok(_) => StatusCode::CREATED.into_response(), // TODO: Redirect
         Err(e) => match e {
             SignupError::UserEmailAlreadyExistsError => {
-                let mut errors = SignupFormErrors::default();
-                errors.email = Some(EMAIL_IS_ALREADY_TAKEN_MESSAGE);
+                let errors = SignupFormErrors {
+                    email: Some(EMAIL_IS_ALREADY_TAKEN_MESSAGE),
+                    ..Default::default()
+                };
                 let form_data = SignupFormData {
                     errors,
                     ..Default::default()
@@ -167,9 +170,16 @@ fn validate_signup_request(data: &SignupRequest) -> Result<(), SignupFormData> {
     }
     Err(SignupFormData {
         focus,
-        values: SignupFormValues { email: &data.email },
+        values: SignupFormValues {
+            email: Some(&data.email),
+        },
         errors,
     })
+}
+
+#[derive(Deserialize)]
+struct SigninQueryParams {
+    next: Option<String>,
 }
 
 #[derive(Template)]
@@ -195,7 +205,8 @@ enum SigninFormField {
 
 #[derive(Default)]
 struct SigninFormValues<'a> {
-    email: &'a str,
+    email: Option<&'a str>,
+    next: Option<String>,
 }
 
 #[derive(Default)]
@@ -211,18 +222,26 @@ impl SigninFormErrors<'_> {
     }
 }
 
-async fn get_signin(Extension(options): Extension<RenderOptions>) -> SigninTemplate<'static> {
-    SigninTemplate {
-        options,
-        form_data: SigninFormData::default(),
-    }
+async fn get_signin(
+    Extension(options): Extension<RenderOptions>,
+    Query(SigninQueryParams { next }): Query<SigninQueryParams>,
+) -> SigninTemplate<'static> {
+    let values = SigninFormValues {
+        next,
+        ..Default::default()
+    };
+    let form_data = SigninFormData {
+        values,
+        ..Default::default()
+    };
+    SigninTemplate { options, form_data }
 }
 
 #[derive(Deserialize)]
 struct SigninRequest {
     email: String,
     password: String,
-    // TODO: Add next URL
+    next: Option<String>,
 }
 
 #[derive(Template)]
@@ -249,7 +268,13 @@ async fn post_signin(
     )
     .await
     {
-        Ok(_) => StatusCode::OK.into_response(), // TODO: Redirect
+        Ok(_) => {
+            if let Some(next) = data.next {
+                Redirect::to(&next).into_response()
+            } else {
+                StatusCode::OK.into_response()
+            }
+        } // TODO: Proper redirect
         Err(e) => match e {
             SigninError::InvalidCredentialsError => {
                 let mut errors = SigninFormErrors::default();
@@ -291,7 +316,10 @@ fn validate_signin_request(data: &SigninRequest) -> Result<(), SigninFormData> {
     }
     Err(SigninFormData {
         focus,
-        values: SigninFormValues { email: &data.email },
+        values: SigninFormValues {
+            email: Some(&data.email),
+            ..Default::default()
+        },
         errors,
     })
 }

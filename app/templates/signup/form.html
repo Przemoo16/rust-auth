@@ -3,8 +3,8 @@
     <label>
         Email:
         <input type="text" name="email"
-            {% if !form_data.values.email.is_empty() %}
-            value="{{ form_data.values.email }}"
+            {% if let Some(value)=form_data.values.email %}
+            value="{{ value }}"
             {% endif %}
             {% if let SignupFormField::Email=form_data.focus %}
             autofocus

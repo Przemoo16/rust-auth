@@ -3,8 +3,8 @@
     <label>
         Email:
         <input type="text" name="email"
-            {% if !form_data.values.email.is_empty() %}
-            value="{{ form_data.values.email }}"
+            {% if let Some(value)=form_data.values.email %}
+            value="{{ value }}"
             {% endif %}
             {% if let SigninFormField::Email=form_data.focus %}
             autofocus
@@ -22,6 +22,9 @@
     </label>
     {% if let Some(error) = form_data.errors.password %}
     <div style="color: red">{{ error }}</div>
+    {% endif %}
+    {% if let Some(next) = form_data.values.next %}
+    <input type="hidden" name="next" value="{{ next }}" />
     {% endif %}
     {% if let Some(error) = form_data.errors.general %}
     <div style="color: red">{{ error }}</div>
