@@ -83,8 +83,8 @@ impl From<HashPasswordError> for AuthenticationError {
 }
 
 pub struct Credentials {
-    email: String,
-    password: String,
+    pub email: String,
+    pub password: String,
 }
 
 #[async_trait]

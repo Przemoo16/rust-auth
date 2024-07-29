@@ -23,7 +23,7 @@
         <script>
             document.addEventListener("DOMContentLoaded", (event) => {
                 document.body.addEventListener('htmx:beforeSwap', function (evt) {
-                    if (evt.detail.xhr.status === 409 || evt.detail.xhr.status === 422) {
+                    if ([401, 409, 422].includes(evt.detail.xhr.status)) {
                         evt.detail.shouldSwap = true;
                         evt.detail.isError = false;
                     }

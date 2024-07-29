@@ -1,6 +1,6 @@
 use crate::db::connection::Database;
 use crate::db::user::{create_user, CreateUserData, CreateUserError};
-use crate::libs::auth::{AuthError, AuthSession};
+use crate::libs::auth::{AuthError, AuthSession, Credentials};
 use crate::libs::password::{hash_password_in_separate_thread, HashPasswordError};
 use std::error::Error;
 use std::fmt::{Display, Formatter, Result as FormatResult};
@@ -66,6 +66,46 @@ pub async fn signup(
         db,
     )
     .await?;
+    auth_session.login(&user).await?;
+    Ok(())
+}
+
+pub struct SigninData {
+    pub email: String,
+    pub password: String,
+}
+
+#[derive(Debug)]
+pub enum SigninError {
+    InvalidCredentialsError,
+    AuthenticationError(AuthError),
+}
+
+impl Error for SigninError {}
+
+impl Display for SigninError {
+    fn fmt(&self, f: &mut Formatter<'_>) -> FormatResult {
+        match self {
+            SigninError::InvalidCredentialsError => write!(f, "Invalid credentials"),
+            SigninError::AuthenticationError(e) => write!(f, "Authentication error: {}", e),
+        }
+    }
+}
+
+impl From<AuthError> for SigninError {
+    fn from(value: AuthError) -> Self {
+        SigninError::AuthenticationError(value)
+    }
+}
+
+pub async fn signin(data: SigninData, auth_session: &mut AuthSession) -> Result<(), SigninError> {
+    let user = auth_session
+        .authenticate(Credentials {
+            email: data.email,
+            password: data.password,
+        })
+        .await?
+        .ok_or(SigninError::InvalidCredentialsError)?;
     auth_session.login(&user).await?;
     Ok(())
 }
