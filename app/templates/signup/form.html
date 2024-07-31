@@ -2,7 +2,7 @@
     style="display: flex; flex-direction: column">
     <label>
         Email:
-        <input type="text" name="email"
+        <input type="text" name="email" placeholder="Email address"
             {% if let Some(value)=form_data.values.email %}
             value="{{ value }}"
             {% endif %}
@@ -15,7 +15,7 @@
     {% endif %}
     <label>
         Password:
-        <input type="password" name="password"
+        <input type="password" name="password" placeholder="Password"
             {% if let SignupFormField::Password=form_data.focus %}
             autofocus
             {% endif %} />
@@ -26,6 +26,7 @@
     <label>
         Confirm Password:
         <input type="password" name="confirm_password"
+            placeholder="Confirm password"
             {% if let SignupFormField::ConfirmPassword=form_data.focus %}
             autofocus
             {% endif %} />

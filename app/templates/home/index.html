@@ -2,9 +2,11 @@
 
 {% block content %}
 {% if is_authenticated %}
-<a hx-post="/logout" hx-target="#main" hx-push-url="true">Log out</a>
+<a hx-post="/logout">Log out</a>
 {% else %}
-<a hx-get="/signin" hx-target="#main" hx-push-url="true">Sign in</a>
-<a hx-get="/signup" hx-target="#main" hx-push-url="true">Sign up</a>
+<div hx-target="#main">
+    <a hx-get="/signin" hx-push-url="true">Sign in</a>
+    <a hx-get="/signup" hx-push-url="true">Sign up</a>
+</div>
 {% endif %}
 {% endblock content %}

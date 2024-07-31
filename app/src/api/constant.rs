@@ -11,3 +11,5 @@ pub const PASSWORD_TOO_LONG_MESSAGE: &str = "Password must be at most 256 charac
 pub const PASSWORD_MISMATCH_MESSAGE: &str = "Password doesn't match";
 pub const EMAIL_IS_ALREADY_TAKEN_MESSAGE: &str = "Email is already taken";
 pub const INVALID_CREDENTIALS_MESSAGE: &str = "Incorrect email or password";
+
+pub const HOME_ROUTE: &str = "/";
