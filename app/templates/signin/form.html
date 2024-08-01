@@ -1,34 +1,34 @@
 <form hx-post="/signin" hx-swap="outerHTML" hx-disabled-elt="#submit"
-    style="display: flex; flex-direction: column">
-    <label>
-        Email:
-        <input type="text" name="email" placeholder="Email address"
-            value="{{ form_data.values.email }}"
-            {% if let SigninFormField::Email=form_data.focus %}
-            autofocus
-            {% endif %} />
-    </label>
-    {% if let Some(error) = form_data.errors.email %}
-    <div style="color: red">{{ error }}</div>
-    {% endif %}
-    <label>
-        Password:
-        <input type="password" name="password" placeholder="Password"
-            {% if let SigninFormField::Password=form_data.focus %}
-            autofocus
-            {% endif %} />
-    </label>
-    {% if let Some(error) = form_data.errors.password %}
-    <div style="color: red">{{ error }}</div>
-    {% endif %}
-    {% if let Some(value) = form_data.values.next %}
-    <input type="hidden" name="next" value="{{ value }}" />
-    {% endif %}
-    {% if let Some(error) = form_data.errors.general %}
-    <div style="color: red">{{ error }}</div>
-    {% endif %}
-    <button id="submit" type="submit">
-        Sign in
-        <span class="htmx-indicator">...</span>
-    </button>
+  style="display: flex; flex-direction: column">
+  <label>
+    Email:
+    <input type="text" name="email" placeholder="Email address"
+      value="{{ form_data.values.email }}"
+      {% if let SigninFormField::Email=form_data.focus %}
+      autofocus
+      {% endif %} />
+  </label>
+  {% if let Some(error) = form_data.errors.email %}
+  <div style="color: red">{{ error }}</div>
+  {% endif %}
+  <label>
+    Password:
+    <input type="password" name="password" placeholder="Password"
+      {% if let SigninFormField::Password=form_data.focus %}
+      autofocus
+      {% endif %} />
+  </label>
+  {% if let Some(error) = form_data.errors.password %}
+  <div style="color: red">{{ error }}</div>
+  {% endif %}
+  {% if let Some(value) = form_data.values.next %}
+  <input type="hidden" name="next" value="{{ value }}" />
+  {% endif %}
+  {% if let Some(error) = form_data.errors.general %}
+  <div style="color: red">{{ error }}</div>
+  {% endif %}
+  <button id="submit" type="submit">
+    Sign in
+    <span class="htmx-indicator">...</span>
+  </button>
 </form>

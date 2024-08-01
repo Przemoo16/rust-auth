@@ -7,11 +7,16 @@ use crate::db::connection::{Database, SessionStore};
 use crate::libs::auth::Backend;
 use crate::libs::signal::shutdown_signal;
 use crate::state::AppState;
-use axum::{middleware::from_fn, routing::get, Router};
+use axum::{
+    middleware::from_fn,
+    routing::{get, get_service},
+    Router,
+};
 use axum_login::login_required;
 use std::net::SocketAddr;
 use time::Duration;
 use tokio::{task::spawn, time::Duration as TaskDuration};
+use tower_http::services::ServeDir;
 use tower_sessions::ExpiredDeletion;
 use tracing::info;
 
@@ -39,7 +44,9 @@ pub async fn run_server(config: ServerConfig) {
         .nest("/", create_auth_router())
         .layer(from_fn(set_render_options))
         .layer(auth_layer)
-        .with_state(state);
+        .with_state(state)
+        .nest_service("/styles", get_service(ServeDir::new("dist/styles")))
+        .nest_service("/scripts", get_service(ServeDir::new("scripts")));
     let socket_address = SocketAddr::from(([0, 0, 0, 0], 3000));
     let listener = tokio::net::TcpListener::bind(&socket_address)
         .await
