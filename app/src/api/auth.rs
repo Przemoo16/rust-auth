@@ -54,7 +54,7 @@ enum SignupFormField {
 
 #[derive(Default)]
 struct SignupFormValues<'a> {
-    email: Option<&'a str>,
+    email: &'a str,
 }
 
 #[derive(Default)]
@@ -113,9 +113,7 @@ async fn post_signup(
         Err(e) => match e {
             SignupError::UserEmailAlreadyExistsError => {
                 let form_data = SignupFormData {
-                    values: SignupFormValues {
-                        email: Some(&data.email),
-                    },
+                    values: SignupFormValues { email: &data.email },
                     errors: SignupFormErrors {
                         email: Some(EMAIL_IS_ALREADY_TAKEN_MESSAGE),
                         ..Default::default()
@@ -172,9 +170,7 @@ fn validate_signup_request(data: &SignupRequest) -> Result<(), SignupFormData> {
     }
     Err(SignupFormData {
         focus,
-        values: SignupFormValues {
-            email: Some(&data.email),
-        },
+        values: SignupFormValues { email: &data.email },
         errors,
     })
 }
@@ -207,7 +203,7 @@ enum SigninFormField {
 
 #[derive(Default)]
 struct SigninFormValues<'a> {
-    email: Option<&'a str>,
+    email: &'a str,
     next: Option<&'a str>,
 }
 
@@ -281,7 +277,7 @@ async fn post_signin(
                 let template = SigninFormTemplate {
                     form_data: SigninFormData {
                         values: SigninFormValues {
-                            email: Some(&data.email),
+                            email: &data.email,
                             next: data.next.as_deref(),
                         },
                         errors: SigninFormErrors {
@@ -324,7 +320,7 @@ fn validate_signin_request(data: &SigninRequest) -> Result<(), SigninFormData> {
     Err(SigninFormData {
         focus,
         values: SigninFormValues {
-            email: Some(&data.email),
+            email: &data.email,
             next: data.next.as_deref(),
         },
         errors,

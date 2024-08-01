@@ -3,9 +3,7 @@
     <label>
         Email:
         <input type="text" name="email" placeholder="Email address"
-            {% if let Some(value)=form_data.values.email %}
-            value="{{ value }}"
-            {% endif %}
+            value="{{ form_data.values.email }}"
             {% if let SigninFormField::Email=form_data.focus %}
             autofocus
             {% endif %} />
