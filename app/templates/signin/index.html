@@ -3,9 +3,16 @@
 {% block title %}<title>Sign In</title>{% endblock %}
 
 {% block content %}
-<h1>Sign in</h1>
-{% include "form.html" %}
-<a hx-get="/signup" hx-target="#main" hx-push-url="true">
-  No account yet?
-</a>
+<div class="flex min-h-screen items-center justify-center bg-base-200">
+  <div class="card w-11/12 max-w-md bg-base-100 shadow-2xl">
+    <div class="card-body gap-5">
+      <h1 class="text-center text-2xl font-bold">Sign in</h1>
+      {% include "form.html" %}
+      <a hx-get="/signup" hx-target="#main" hx-push-url="true"
+        class="link-hover link link-primary">
+        No account yet?
+      </a>
+    </div>
+  </div>
+</div>
 {% endblock %}

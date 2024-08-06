@@ -1,8 +1,8 @@
-<form hx-post="/signup" hx-swap="outerHTML" hx-disabled-elt="#submit"
+<form hx-post="/signup" hx-swap="outerHTML" hx-disabled-elt="#submit" novalidate
   style="display: flex; flex-direction: column">
   <label>
     Email:
-    <input type="text" name="email" placeholder="Email address"
+    <input type="email" name="email" placeholder="Email address"
       value="{{ form_data.values.email }}"
       {% if let SignupFormField::Email=form_data.focus %}
       autofocus

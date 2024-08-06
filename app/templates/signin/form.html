@@ -1,34 +1,46 @@
-<form hx-post="/signin" hx-swap="outerHTML" hx-disabled-elt="#submit"
-  style="display: flex; flex-direction: column">
-  <label>
-    Email:
-    <input type="text" name="email" placeholder="Email address"
+<form hx-post="/signin" hx-swap="outerHTML" hx-disabled-elt="#submit" novalidate
+  class="flex flex-col gap-2">
+  <label class="form-control">
+    <div class="label">
+      <span class="label-text">
+        Email
+        <span class="text-error">*</span>
+      </span>
+    </div>
+    <input type="email" name="email" placeholder="Email address" required
       value="{{ form_data.values.email }}"
       {% if let SigninFormField::Email=form_data.focus %}
       autofocus
-      {% endif %} />
+      {% endif %}
+      class="input input-bordered {% if form_data.errors.email.is_some() %}input-error{% endif %}" />
+    {% if let Some(error) = form_data.errors.email %}
+    <div class="mt-2 text-error">{{ error }}</div>
+    {% endif %}
   </label>
-  {% if let Some(error) = form_data.errors.email %}
-  <div style="color: red">{{ error }}</div>
-  {% endif %}
-  <label>
-    Password:
-    <input type="password" name="password" placeholder="Password"
+  <label class="form-control">
+    <div class="label">
+      <span class="label-text">
+        Password
+        <span class="text-error">*</span>
+      </span>
+    </div>
+    <input type="password" name="password" placeholder="Password" required
       {% if let SigninFormField::Password=form_data.focus %}
       autofocus
-      {% endif %} />
+      {% endif %}
+      class="input input-bordered{% if form_data.errors.password.is_some() %} input-error{% endif %}" />
+    {% if let Some(error) = form_data.errors.password %}
+    <div class="mt-2 text-error">{{ error }}</div>
+    {% endif %}
   </label>
-  {% if let Some(error) = form_data.errors.password %}
-  <div style="color: red">{{ error }}</div>
-  {% endif %}
   {% if let Some(value) = form_data.values.next %}
   <input type="hidden" name="next" value="{{ value }}" />
   {% endif %}
   {% if let Some(error) = form_data.errors.general %}
-  <div style="color: red">{{ error }}</div>
+  <div class="mt-2 text-error">{{ error }}</div>
   {% endif %}
-  <button id="submit" type="submit">
+  <button id="submit" type="submit" class="btn btn-primary mt-3">
     Sign in
-    <span class="htmx-indicator">...</span>
+    <span class="htmx-indicator loading loading-dots"></span>
   </button>
 </form>
