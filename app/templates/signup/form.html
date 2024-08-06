@@ -1,39 +1,57 @@
 <form hx-post="/signup" hx-swap="outerHTML" hx-disabled-elt="#submit" novalidate
-  style="display: flex; flex-direction: column">
-  <label>
-    Email:
-    <input type="email" name="email" placeholder="Email address"
+  class="flex flex-col gap-2">
+  <label class="form-control">
+    <div class="label">
+      <span class="label-text">
+        Email
+        <span class="text-error">*</span>
+      </span>
+    </div>
+    <input type="email" name="email" placeholder="Email address" required
       value="{{ form_data.values.email }}"
       {% if let SignupFormField::Email=form_data.focus %}
       autofocus
-      {% endif %} />
+      {% endif %}
+      class="input input-bordered {% if form_data.errors.email.is_some() %}input-error{% endif %}" />
+    {% if let Some(error) = form_data.errors.email %}
+    <div class="mt-2 text-error">{{ error }}</div>
+    {% endif %}
   </label>
-  {% if let Some(error) = form_data.errors.email %}
-  <div style="color: red">{{ error }}</div>
-  {% endif %}
-  <label>
-    Password:
-    <input type="password" name="password" placeholder="Password"
+  <label class="form-control">
+    <div class="label">
+      <span class="label-text">
+        Password
+        <span class="text-error">*</span>
+      </span>
+    </div>
+    <input type="password" name="password" placeholder="Password" required
       {% if let SignupFormField::Password=form_data.focus %}
       autofocus
-      {% endif %} />
+      {% endif %}
+      class="input input-bordered{% if form_data.errors.password.is_some() %} input-error{% endif %}" />
+    {% if let Some(error) = form_data.errors.password %}
+    <div class="mt-2 text-error">{{ error }}</div>
+    {% endif %}
   </label>
-  {% if let Some(error) = form_data.errors.password %}
-  <div style="color: red">{{ error }}</div>
-  {% endif %}
-  <label>
-    Confirm Password:
+  <label class="form-control">
+    <div class="label">
+      <span class="label-text">
+        Confirm Password
+        <span class="text-error">*</span>
+      </span>
+    </div>
     <input type="password" name="confirm_password"
-      placeholder="Confirm password"
+      placeholder="Confirm password" required
       {% if let SignupFormField::ConfirmPassword=form_data.focus %}
       autofocus
-      {% endif %} />
+      {% endif %}
+      class="input input-bordered{% if form_data.errors.confirm_password.is_some() %} input-error{% endif %}" />
+    {% if let Some(error) = form_data.errors.confirm_password %}
+    <div class="mt-2 text-error">{{ error }}</div>
+    {% endif %}
   </label>
-  {% if let Some(error) = form_data.errors.confirm_password %}
-  <div style="color: red">{{ error }}</div>
-  {% endif %}
-  <button id="submit" type="submit">
+  <button id="submit" type="submit" class="btn btn-primary mt-3">
     Sign up
-    <span class="htmx-indicator">...</span>
+    <span class="htmx-indicator loading loading-dots"></span>
   </button>
 </form>
