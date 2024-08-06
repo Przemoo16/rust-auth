@@ -14,7 +14,7 @@
       {% endif %}
       class="input input-bordered {% if form_data.errors.email.is_some() %}input-error{% endif %}" />
     {% if let Some(error) = form_data.errors.email %}
-    <div class="mt-2 text-error">{{ error }}</div>
+    <p class="mt-2 text-error">{{ error }}</p>
     {% endif %}
   </label>
   <label class="form-control">
@@ -30,14 +30,14 @@
       {% endif %}
       class="input input-bordered{% if form_data.errors.password.is_some() %} input-error{% endif %}" />
     {% if let Some(error) = form_data.errors.password %}
-    <div class="mt-2 text-error">{{ error }}</div>
+    <p class="mt-2 text-error">{{ error }}</p>
     {% endif %}
   </label>
   {% if let Some(value) = form_data.values.next %}
   <input type="hidden" name="next" value="{{ value }}" />
   {% endif %}
   {% if let Some(error) = form_data.errors.general %}
-  <div class="mt-2 text-error">{{ error }}</div>
+  <p class="mt-2 text-error">{{ error }}</p>
   {% endif %}
   <button id="submit" type="submit" class="btn btn-primary mt-3">
     Sign in
