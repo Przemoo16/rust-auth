@@ -8,7 +8,7 @@ pub fn create_main_router() -> Router<AppState> {
 }
 
 #[derive(Template)]
-#[template(path = "home/index.html")]
+#[template(path = "pages/home/index.html")]
 struct HomeTemplate {
     options: RenderOptions,
     is_authenticated: bool,

@@ -31,7 +31,7 @@ pub fn create_auth_router() -> Router<AppState> {
 }
 
 #[derive(Template)]
-#[template(path = "signup/index.html")]
+#[template(path = "pages/signup/index.html")]
 struct SignupTemplate<'a> {
     options: RenderOptions,
     form_data: SignupFormData<'a>,
@@ -85,7 +85,7 @@ struct SignupRequest {
 }
 
 #[derive(Template)]
-#[template(path = "signup/form.html")]
+#[template(path = "pages/signup/form.html")]
 struct SignupFormTemplate<'a> {
     form_data: SignupFormData<'a>,
 }
@@ -181,7 +181,7 @@ struct SigninParams {
 }
 
 #[derive(Template)]
-#[template(path = "signin/index.html")]
+#[template(path = "pages/signin/index.html")]
 struct SigninTemplate<'a> {
     options: RenderOptions,
     form_data: SigninFormData<'a>,
@@ -245,7 +245,7 @@ struct SigninRequest {
 }
 
 #[derive(Template)]
-#[template(path = "signin/form.html")]
+#[template(path = "pages/signin/form.html")]
 struct SigninFormTemplate<'a> {
     form_data: SigninFormData<'a>,
 }
