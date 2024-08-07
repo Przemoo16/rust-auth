@@ -44,7 +44,7 @@ struct SignupFormData<'a> {
     errors: SignupFormErrors<'a>,
 }
 
-#[derive(Default)]
+#[derive(PartialEq, Default)]
 enum SignupFormField {
     #[default]
     Email,
@@ -194,7 +194,7 @@ struct SigninFormData<'a> {
     errors: SigninFormErrors<'a>,
 }
 
-#[derive(Default)]
+#[derive(PartialEq, Default)]
 enum SigninFormField {
     #[default]
     Email,

@@ -1,40 +1,29 @@
+{%- import "components/text-input.html" as text_input_component -%}
+
 <form hx-post="/signin" hx-swap="outerHTML" hx-disabled-elt="#submit" novalidate
   class="flex flex-col gap-2">
-  <label class="form-control">
-    <div class="label">
-      <span class="label-text">
-        Email
-        <span class="text-error">*</span>
-      </span>
-    </div>
-    <input type="email" name="email" placeholder="Email address" required
-      value="{{ form_data.values.email }}"
-      {% if let SigninFormField::Email=form_data.focus %}
-      autofocus
-      {% endif %}
-      class="input input-bordered {% if form_data.errors.email.is_some() %}input-error{% endif %}" />
-    {% if let Some(error) = form_data.errors.email %}
-    <p class="mt-2 text-error">{{ error }}</p>
-    {% endif %}
-  </label>
-  <label class="form-control">
-    <div class="label">
-      <span class="label-text">
-        Password
-        <span class="text-error">*</span>
-      </span>
-    </div>
-    <input type="password" name="password" placeholder="Password" required
-      {% if let SigninFormField::Password=form_data.focus %}
-      autofocus
-      {% endif %}
-      class="input input-bordered{% if form_data.errors.password.is_some() %} input-error{% endif %}" />
-    {% if let Some(error) = form_data.errors.password %}
-    <p class="mt-2 text-error">{{ error }}</p>
-    {% endif %}
-  </label>
+  {% call text_input_component::text_input(
+    name="email",
+    label="Email",
+    input_type="email",
+    value=form_data.values.email,
+    placeholder="Email address",
+    required=true,
+    autofocus=SigninFormField::Email==form_data.focus,
+    error=form_data.errors.email
+  ) %}
+  {% call text_input_component::text_input(
+    name="password",
+    label="Password",
+    input_type="password",
+    value="",
+    placeholder="Password",
+    required=true,
+    autofocus=SigninFormField::Password==form_data.focus,
+    error=form_data.errors.password
+  ) %}
   {% if let Some(value) = form_data.values.next %}
-  <input type="hidden" name="next" value="{{ value }}" />
+  <input name="next" type="hidden" value="{{ value }}" />
   {% endif %}
   {% if let Some(error) = form_data.errors.general %}
   <p class="mt-2 text-error">{{ error }}</p>
