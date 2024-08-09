@@ -6,7 +6,7 @@ use crate::api::constant::{
 };
 use crate::api::middleware::RenderOptions;
 use crate::api::response::create_redirect_response;
-use crate::libs::auth::AuthSession;
+use crate::libs::auth::{is_anonymous, AuthSession};
 use crate::libs::validation::is_valid_email;
 use crate::operations::auth::{
     log_out, sign_in, sign_up, SigninData, SigninError, SignupData, SignupError,
@@ -16,17 +16,34 @@ use askama_axum::Template;
 use axum::{
     extract::{Extension, Query, State},
     http::StatusCode,
-    response::IntoResponse,
+    response::{IntoResponse, Redirect},
     routing::{get, post},
     Form, Router,
 };
+use axum_login::predicate_required;
 use serde::Deserialize;
 use tracing::error;
 
 pub fn create_auth_router() -> Router<AppState> {
     Router::new()
-        .route("/signup", get(get_signup).post(post_signup))
-        .route("/signin", get(get_signin).post(post_signin))
+        .route(
+            "/signup",
+            get(get_signup)
+                .route_layer(predicate_required!(
+                    is_anonymous,
+                    Redirect::temporary(HOME_ROUTE)
+                ))
+                .post(post_signup),
+        )
+        .route(
+            "/signin",
+            get(get_signin)
+                .route_layer(predicate_required!(
+                    is_anonymous,
+                    Redirect::temporary(HOME_ROUTE)
+                ))
+                .post(post_signin),
+        )
         .route("/logout", post(post_logout))
 }
 

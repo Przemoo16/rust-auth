@@ -114,5 +114,9 @@ impl AuthnBackend for Backend {
     }
 }
 
+pub async fn is_anonymous(auth_session: AuthSession) -> bool {
+    auth_session.user.is_none()
+}
+
 pub type AuthSession = BaseAuthSession<Backend>;
 pub type AuthError = BaseError<Backend>;
