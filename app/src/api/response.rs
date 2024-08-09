@@ -1,6 +1,6 @@
 use axum::{http::StatusCode, response::IntoResponse};
 
-const MAIN_CONTENT_SELECTOR: &str = "#main";
+const PAGE_CONTENT_SELECTOR: &str = "#page";
 
 pub fn create_redirect_response(status_code: StatusCode, path: &str) -> impl IntoResponse {
     (
@@ -9,7 +9,7 @@ pub fn create_redirect_response(status_code: StatusCode, path: &str) -> impl Int
             "HX-Location",
             format!(
                 r#"{{"path":"{}","target":"{}"}}"#,
-                path, MAIN_CONTENT_SELECTOR
+                path, PAGE_CONTENT_SELECTOR
             ),
         )],
     )
