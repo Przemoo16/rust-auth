@@ -1,3 +1,29 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
+@layer utilities {
+  .indicator {
+    visibility: hidden;
+    opacity: 0;
+    transition: visibility 0s, opacity 500ms ease-in;
+  }
+  .htmx-request .indicator {
+    visibility: visible;
+    opacity: 1;
+  }
+  .htmx-request.indicator {
+    visibility: visible;
+    opacity: 1;
+  }
+
+  .indicator-inverse {
+    display: inline;
+  }
+  .htmx-request .indicator-inverse {
+    display: none;
+  }
+  .htmx-request.indicator-inverse {
+    display: none;
+  }
+}

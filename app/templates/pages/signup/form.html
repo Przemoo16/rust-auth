@@ -32,8 +32,8 @@
     autofocus=SignupFormField::ConfirmPassword==form_data.focus,
     error=form_data.errors.confirm_password
   ) %}
-  <button id="submit" type="submit" class="btn btn-primary mt-3">
-    Sign up
-    <span class="htmx-indicator loading loading-dots"></span>
+  <button id="submit" type="submit" class="btn btn-primary mt-3 relative">
+    <span class="indicator-inverse absolute">Sign up</span>
+    <span class="indicator loading loading-dots absolute"></span>
   </button>
 </form>

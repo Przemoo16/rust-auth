@@ -5,9 +5,10 @@
   <div class="card w-11/12 max-w-md bg-base-100 shadow-2xl">
     <div class="card-body">
       {% if is_authenticated %}
-      <button hx-post="/logout" hx-disabled-elt="this" class="btn btn-primary">
-        Log out
-        <span class="htmx-indicator loading loading-dots"></span>
+      <button hx-post="/logout" hx-disabled-elt="this"
+        class="btn btn-primary relative">
+        <span class="indicator-inverse absolute">Log out</span>
+        <span class="indicator loading loading-dots absolute"></span>
       </button>
       {% else %}
       <div hx-target="#main" class="flex items-center justify-center gap-2">
