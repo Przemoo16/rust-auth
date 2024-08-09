@@ -1,8 +1,13 @@
-use axum::{http::StatusCode, response::IntoResponse};
+use axum::{
+    http::StatusCode,
+    response::{IntoResponse, Redirect},
+};
+
+use crate::api::constant::HOME_ROUTE;
 
 const PAGE_CONTENT_SELECTOR: &str = "#page";
 
-pub fn create_redirect_response(status_code: StatusCode, path: &str) -> impl IntoResponse {
+pub fn create_client_side_redirect(status_code: StatusCode, path: &str) -> impl IntoResponse {
     (
         status_code,
         [(
@@ -14,4 +19,8 @@ pub fn create_redirect_response(status_code: StatusCode, path: &str) -> impl Int
         )],
     )
         .into_response()
+}
+
+pub fn create_redirect_for_authenticated() -> Redirect {
+    Redirect::temporary(HOME_ROUTE)
 }

@@ -5,7 +5,7 @@ use crate::api::constant::{
     PASSWORD_TOO_SHORT_MESSAGE,
 };
 use crate::api::middleware::RenderOptions;
-use crate::api::response::create_redirect_response;
+use crate::api::response::{create_client_side_redirect, create_redirect_for_authenticated};
 use crate::libs::auth::{is_anonymous, AuthSession};
 use crate::libs::validation::is_valid_email;
 use crate::operations::auth::{
@@ -16,7 +16,7 @@ use askama_axum::Template;
 use axum::{
     extract::{Extension, Query, State},
     http::StatusCode,
-    response::{IntoResponse, Redirect},
+    response::IntoResponse,
     routing::{get, post},
     Form, Router,
 };
@@ -31,7 +31,7 @@ pub fn create_auth_router() -> Router<AppState> {
             get(get_signup)
                 .route_layer(predicate_required!(
                     is_anonymous,
-                    Redirect::temporary(HOME_ROUTE)
+                    create_redirect_for_authenticated()
                 ))
                 .post(post_signup),
         )
@@ -40,7 +40,7 @@ pub fn create_auth_router() -> Router<AppState> {
             get(get_signin)
                 .route_layer(predicate_required!(
                     is_anonymous,
-                    Redirect::temporary(HOME_ROUTE)
+                    create_redirect_for_authenticated()
                 ))
                 .post(post_signin),
         )
@@ -126,7 +126,7 @@ async fn post_signup(
     )
     .await
     {
-        Ok(_) => create_redirect_response(StatusCode::CREATED, HOME_ROUTE).into_response(),
+        Ok(_) => create_client_side_redirect(StatusCode::CREATED, HOME_ROUTE).into_response(),
         Err(e) => match e {
             SignupError::UserEmailAlreadyExistsError => {
                 let form_data = SignupFormData {
@@ -287,7 +287,7 @@ async fn post_signin(
     {
         Ok(_) => {
             let next_url = data.next.as_deref().unwrap_or(HOME_ROUTE);
-            create_redirect_response(StatusCode::OK, next_url).into_response()
+            create_client_side_redirect(StatusCode::OK, next_url).into_response()
         }
         Err(e) => match e {
             SigninError::InvalidCredentialsError => {
@@ -346,7 +346,7 @@ fn validate_signin_request(data: &SigninRequest) -> Result<(), SigninFormData> {
 
 async fn post_logout(mut auth_session: AuthSession) -> impl IntoResponse {
     match log_out(&mut auth_session).await {
-        Ok(_) => create_redirect_response(StatusCode::NO_CONTENT, HOME_ROUTE).into_response(),
+        Ok(_) => create_client_side_redirect(StatusCode::NO_CONTENT, HOME_ROUTE).into_response(),
         Err(e) => {
             error!("Failed to log out: {:?}", e);
             StatusCode::INTERNAL_SERVER_ERROR.into_response()
