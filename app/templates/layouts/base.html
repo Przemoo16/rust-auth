@@ -19,7 +19,7 @@
 
   <body>
     <main id="main">
-      {% block content %}{% endblock %}
+      {% block layout %}{% endblock %}
     </main>
     <script src="scripts/main.js"></script>
   </body>
@@ -27,5 +27,5 @@
 </html>
 {% else %}
 {% block title %}{% endblock %}
-{% block content %}{% endblock %}
+{% block layout %}{% endblock %}
 {% endif %}

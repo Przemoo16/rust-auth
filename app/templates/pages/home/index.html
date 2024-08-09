@@ -1,24 +1,18 @@
-{% extends "layouts/base.html" %}
+{% extends "layouts/home.html" %}
 
 {% block content %}
-<div class="flex min-h-screen items-center justify-center bg-base-200">
-  <div class="card w-11/12 max-w-md bg-base-100 shadow-2xl">
-    <div class="card-body">
-      {% if is_authenticated %}
-      <button hx-post="/logout" hx-disabled-elt="this"
-        class="btn btn-primary relative">
-        <span class="indicator-inverse absolute">Log out</span>
-        <span class="indicator loading loading-dots absolute"></span>
-      </button>
-      {% else %}
-      <div hx-target="#main" class="flex items-center justify-center gap-2">
-        <a hx-get="/signin" hx-push-url="true"
-          class="btn btn-ghost">Sign in</a>
-        <a hx-get="/signup" hx-push-url="true"
-          class="btn btn-outline btn-primary">Sign up</a>
-      </div>
-      {% endif %}
-    </div>
-  </div>
+{% if is_authenticated %}
+<button hx-post="/logout" hx-disabled-elt="this"
+  class="btn btn-primary relative">
+  <span class="indicator-inverse absolute">Log out</span>
+  <span class="indicator loading loading-dots absolute"></span>
+</button>
+{% else %}
+<div hx-target="#main" class="flex items-center justify-center gap-2">
+  <a hx-get="/signin" hx-push-url="true"
+    class="btn btn-ghost">Sign in</a>
+  <a hx-get="/signup" hx-push-url="true"
+    class="btn btn-outline btn-primary">Sign up</a>
 </div>
-{% endblock content %}
+{% endif %}
+{% endblock %}
