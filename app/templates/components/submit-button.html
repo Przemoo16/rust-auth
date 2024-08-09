@@ -1,0 +1,11 @@
+{% macro submit_button(
+  id,
+  text,
+  class
+) %}
+<button id="{{ id }}" type="submit"
+  class="btn btn-primary relative{% if !class.is_empty() %} {{ class }}{% endif %}">
+  <span class="indicator-inverse absolute">{{ text }}</span>
+  <span class="indicator loading loading-dots absolute"></span>
+</button>
+{% endmacro %}

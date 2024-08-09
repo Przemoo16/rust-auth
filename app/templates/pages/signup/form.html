@@ -1,3 +1,4 @@
+{%- import "components/submit-button.html" as submit_button_component -%}
 {%- import "components/text-input.html" as text_input_component -%}
 
 <form hx-post="/signup" hx-swap="outerHTML" hx-disabled-elt="#submit" novalidate
@@ -32,8 +33,9 @@
     autofocus=SignupFormField::ConfirmPassword==form_data.focus,
     error=form_data.errors.confirm_password
   ) %}
-  <button id="submit" type="submit" class="btn btn-primary mt-3 relative">
-    <span class="indicator-inverse absolute">Sign up</span>
-    <span class="indicator loading loading-dots absolute"></span>
-  </button>
+  {% call submit_button_component::submit_button(
+    id="submit",
+    text="Sign up",
+    class="mt-3"
+  ) %}
 </form>
