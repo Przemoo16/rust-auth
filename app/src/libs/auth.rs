@@ -1,10 +1,11 @@
 use crate::db::{
     connection::Database,
-    user::{get_user_by_email, get_user_by_id, GetUserError, User},
+    user::{get_auth_user_by_email, get_auth_user_by_id, AuthUser, GetUserError},
 };
 use async_trait::async_trait;
 use axum_login::{
-    AuthSession as BaseAuthSession, AuthUser, AuthnBackend, Error as BaseError, UserId,
+    AuthSession as BaseAuthSession, AuthUser as BaseAuthUser, AuthnBackend, Error as BaseError,
+    UserId,
 };
 use std::error::Error;
 use std::fmt::{Display, Formatter, Result as FormatResult};
@@ -25,7 +26,7 @@ impl Backend {
     }
 }
 
-impl AuthUser for User {
+impl BaseAuthUser for AuthUser {
     type Id = i32;
 
     fn id(&self) -> Self::Id {
@@ -89,7 +90,7 @@ pub struct Credentials {
 
 #[async_trait]
 impl AuthnBackend for Backend {
-    type User = User;
+    type User = AuthUser;
     type Credentials = Credentials;
     type Error = AuthenticationError;
 
@@ -97,7 +98,7 @@ impl AuthnBackend for Backend {
         &self,
         creds: Self::Credentials,
     ) -> Result<Option<Self::User>, Self::Error> {
-        if let Some(user) = get_user_by_email(&creds.email, &self.db).await? {
+        if let Some(user) = get_auth_user_by_email(&creds.email, &self.db).await? {
             if verify_password_in_separate_thread(creds.password, user.password.clone()).await? {
                 return Ok(Some(user));
             }
@@ -109,7 +110,7 @@ impl AuthnBackend for Backend {
     }
 
     async fn get_user(&self, user_id: &UserId<Self>) -> Result<Option<Self::User>, Self::Error> {
-        let user = get_user_by_id(user_id, &self.db).await?;
+        let user = get_auth_user_by_id(user_id, &self.db).await?;
         Ok(user)
     }
 }

@@ -4,14 +4,14 @@ use std::error::Error;
 use std::fmt::{Debug as FormatDebug, Display, Formatter, Result as FormatResult};
 
 #[derive(Clone)]
-pub struct User {
+pub struct AuthUser {
     pub id: i32,
     pub password: String,
 }
 
-impl FormatDebug for User {
+impl FormatDebug for AuthUser {
     fn fmt(&self, f: &mut Formatter<'_>) -> FormatResult {
-        f.debug_struct("User")
+        f.debug_struct("AuthUser")
             .field("id", &self.id)
             .field("password", &"********")
             .finish()
@@ -53,9 +53,12 @@ impl From<SqlxError> for CreateUserError {
     }
 }
 
-pub async fn create_user(data: CreateUserData<'_>, db: &Database) -> Result<User, CreateUserError> {
+pub async fn create_user(
+    data: CreateUserData<'_>,
+    db: &Database,
+) -> Result<AuthUser, CreateUserError> {
     let user = query_as!(
-        User,
+        AuthUser,
         "INSERT INTO users (email, password) VALUES ($1, $2) RETURNING id, password",
         data.email,
         data.password,
@@ -82,16 +85,22 @@ impl From<SqlxError> for GetUserError {
     }
 }
 
-pub async fn get_user_by_id(id: &i32, db: &Database) -> Result<Option<User>, GetUserError> {
-    let user = query_as!(User, "SELECT id, password FROM users WHERE id = $1", id)
+pub async fn get_auth_user_by_id(
+    id: &i32,
+    db: &Database,
+) -> Result<Option<AuthUser>, GetUserError> {
+    let user = query_as!(AuthUser, "SELECT id, password FROM users WHERE id = $1", id)
         .fetch_optional(db)
         .await?;
     Ok(user)
 }
 
-pub async fn get_user_by_email(email: &str, db: &Database) -> Result<Option<User>, GetUserError> {
+pub async fn get_auth_user_by_email(
+    email: &str,
+    db: &Database,
+) -> Result<Option<AuthUser>, GetUserError> {
     let user = query_as!(
-        User,
+        AuthUser,
         "SELECT id, password FROM users WHERE email = $1",
         email
     )
