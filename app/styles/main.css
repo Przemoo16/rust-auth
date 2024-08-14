@@ -18,12 +18,15 @@
   }
 
   .indicator-inverse {
-    display: inline;
+    visibility: visible;
+    opacity: 1;
   }
   .htmx-request .indicator-inverse {
-    display: none;
+    visibility: hidden;
+    opacity: 0;
   }
   .htmx-request.indicator-inverse {
-    display: none;
+    visibility: hidden;
+    opacity: 0;
   }
 }

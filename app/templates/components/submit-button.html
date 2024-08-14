@@ -1,3 +1,5 @@
+{%- import "components/button-loader.html" as button_loader_component -%}
+
 {% macro submit_button(
   id,
   text,
@@ -6,6 +8,6 @@
 <button id="{{ id }}" type="submit"
   class="btn btn-primary relative{% if !class.is_empty() %} {{ class }}{% endif %}">
   <span class="indicator-inverse absolute">{{ text }}</span>
-  <span class="indicator loading loading-dots absolute"></span>
+  {% call button_loader_component::button_loader() %}
 </button>
 {% endmacro %}
