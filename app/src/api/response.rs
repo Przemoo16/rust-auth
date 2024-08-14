@@ -9,7 +9,7 @@ use axum::{
 use crate::api::constant::HOME_ROUTE;
 
 const PAGE_CONTENT_SELECTOR: &str = "#page";
-const PAGE_CACHE_MAX_AGE: u32 = 1 * 24 * 60 * 60;
+const PAGE_CACHE_MAX_AGE: u32 = 7 * 24 * 60 * 60;
 
 pub fn create_client_side_redirect(status_code: StatusCode, path: &str) -> impl IntoResponse {
     (
