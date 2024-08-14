@@ -5,7 +5,9 @@ use crate::api::constant::{
     PASSWORD_TOO_SHORT_MESSAGE,
 };
 use crate::api::middleware::RenderOptions;
-use crate::api::response::{create_client_side_redirect, create_redirect_for_authenticated};
+use crate::api::response::{
+    create_client_side_redirect, create_redirect_for_authenticated, WithCache,
+};
 use crate::libs::auth::{is_anonymous, AuthSession};
 use crate::libs::validation::is_valid_email;
 use crate::operations::auth::{
@@ -87,11 +89,13 @@ impl SignupFormErrors<'_> {
     }
 }
 
-async fn get_signup(Extension(options): Extension<RenderOptions>) -> SignupTemplate<'static> {
+async fn get_signup(Extension(options): Extension<RenderOptions>) -> impl IntoResponse {
     SignupTemplate {
         options,
         form_data: SignupFormData::default(),
     }
+    .into_response()
+    .with_cache()
 }
 
 #[derive(Deserialize)]
@@ -252,6 +256,7 @@ async fn get_signin(
         },
     }
     .into_response()
+    .with_cache()
 }
 
 #[derive(Deserialize)]
