@@ -7,7 +7,7 @@
 ) %}
 <button id="{{ id }}" type="submit"
   class="btn btn-primary relative{% if !class.is_empty() %} {{ class }}{% endif %}">
-  <span class="indicator-inverse absolute">{{ text }}</span>
+  <span class="button-indicator-inverse absolute">{{ text }}</span>
   {% call button_loader_component::button_loader() %}
 </button>
 {% endmacro %}

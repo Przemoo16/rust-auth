@@ -3,32 +3,59 @@
 @tailwind utilities;
 
 @layer utilities {
-  .indicator {
+  .button-indicator {
+    visibility: hidden;
+    opacity: 0;
+    transition: visibility 0s, opacity 500ms ease-in;
+  }
+  .htmx-request .button-indicator {
+    visibility: visible;
+    opacity: 1;
+  }
+  .htmx-request.button-indicator {
+    visibility: visible;
+    opacity: 1;
+  }
+
+  .button-indicator-inverse {
+    visibility: visible;
+    opacity: 1;
+  }
+  .htmx-request .button-indicator-inverse {
+    visibility: hidden;
+    opacity: 0;
+  }
+  .htmx-request.button-indicator-inverse {
+    visibility: hidden;
+    opacity: 0;
+  }
+
+  .page-indicator {
     visibility: hidden;
     opacity: 0;
     transition: visibility 0s, opacity 300ms ease-in;
     transition-delay: 200ms;
   }
-  .htmx-request .indicator {
+  .htmx-request .page-indicator {
     visibility: visible;
     opacity: 1;
   }
-  .htmx-request.indicator {
+  .htmx-request.page-indicator {
     visibility: visible;
     opacity: 1;
   }
 
-  .indicator-inverse {
+  .page-indicator-inverse {
     visibility: visible;
     opacity: 1;
-    transition-property: opacity;
-    transition-delay: 100ms;
+    transition-property: visibility, opacity;
+    transition-delay: 200ms;
   }
-  .htmx-request .indicator-inverse {
+  .htmx-request .page-indicator-inverse {
     visibility: hidden;
     opacity: 0;
   }
-  .htmx-request.indicator-inverse {
+  .htmx-request.page-indicator-inverse {
     visibility: hidden;
     opacity: 0;
   }

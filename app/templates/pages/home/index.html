@@ -6,7 +6,7 @@
 {% if is_authenticated %}
 <button hx-post="/logout" hx-disabled-elt="this"
   class="btn btn-primary relative">
-  <span class="indicator-inverse absolute">Log out</span>
+  <span class="button-indicator-inverse absolute">Log out</span>
   {% call button_loader_component::button_loader() %}
 </button>
 {% else %}
