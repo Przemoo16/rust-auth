@@ -10,8 +10,7 @@
   {% call button_loader_component::button_loader() %}
 </button>
 {% else %}
-<div hx-target="#page" hx-indicator="#page"
-  class="flex items-center justify-center gap-2">
+<div hx-target="#page" class="flex items-center justify-center gap-2">
   <a hx-get="/signin" hx-push-url="true"
     class="btn btn-ghost">Sign in</a>
   <a hx-get="/signup" hx-push-url="true"

@@ -33,8 +33,7 @@
   .page-indicator {
     visibility: hidden;
     opacity: 0;
-    transition: visibility 0s, opacity 300ms ease-in;
-    transition-delay: 200ms;
+    transition: visibility 0s, opacity 500ms ease-in;
   }
   .htmx-request .page-indicator {
     visibility: visible;
@@ -48,8 +47,6 @@
   .page-indicator-inverse {
     visibility: visible;
     opacity: 1;
-    transition-property: visibility, opacity;
-    transition-delay: 200ms;
   }
   .htmx-request .page-indicator-inverse {
     visibility: hidden;
