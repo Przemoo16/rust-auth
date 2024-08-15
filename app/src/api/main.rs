@@ -1,7 +1,7 @@
 use crate::state::AppState;
 use crate::{api::middleware::RenderOptions, libs::auth::AuthSession};
 use askama_axum::Template;
-use axum::{extract::Extension, routing::get, Router};
+use axum::{extract::Extension, http::StatusCode, response::IntoResponse, routing::get, Router};
 
 pub fn create_main_router() -> Router<AppState> {
     Router::new().route("/", get(home))
@@ -31,6 +31,7 @@ pub struct NotFoundTemplate {
     options: RenderOptions,
 }
 
-pub async fn handler_404(Extension(options): Extension<RenderOptions>) -> NotFoundTemplate {
-    NotFoundTemplate { options }
+pub async fn handler_404(Extension(options): Extension<RenderOptions>) -> impl IntoResponse {
+    let template = NotFoundTemplate { options };
+    (StatusCode::NOT_FOUND, template).into_response()
 }
