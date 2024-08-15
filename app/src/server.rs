@@ -1,7 +1,7 @@
 use crate::api::auth::create_auth_router;
 use crate::api::constant::SIGNIN_ROUTE;
 use crate::api::layer::create_auth_layer;
-use crate::api::main::create_main_router;
+use crate::api::main::{create_main_router, handler_404};
 use crate::api::middleware::set_render_options;
 use crate::config::Config;
 use crate::db::connection::{Database, SessionStore};
@@ -43,6 +43,7 @@ pub async fn run_server(config: ServerConfig) {
         .route_layer(login_required!(Backend, login_url = SIGNIN_ROUTE))
         .nest("/", create_main_router())
         .nest("/", create_auth_router())
+        .fallback(handler_404)
         .layer(from_fn(set_render_options))
         .layer(auth_layer)
         .with_state(state)

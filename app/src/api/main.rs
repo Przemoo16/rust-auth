@@ -24,3 +24,13 @@ async fn home(
         is_authenticated,
     }
 }
+
+#[derive(Template)]
+#[template(path = "pages/404.html")]
+pub struct NotFoundTemplate {
+    options: RenderOptions,
+}
+
+pub async fn handler_404(Extension(options): Extension<RenderOptions>) -> NotFoundTemplate {
+    NotFoundTemplate { options }
+}
