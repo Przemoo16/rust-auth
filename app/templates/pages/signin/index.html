@@ -5,7 +5,7 @@
 {% block content %}
 <h1 class="text-center text-2xl font-bold">Sign in</h1>
 {% include "form.html" %}
-<a hx-get="/signup" hx-target="#page" hx-push-url="true"
+<a hx-get="/signup" hx-target="#page" hx-push-url="true" hx-indicator="#page"
   class="link-hover link link-primary">
   No account yet?
 </a>

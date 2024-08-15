@@ -6,7 +6,8 @@
   .indicator {
     visibility: hidden;
     opacity: 0;
-    transition: visibility 0s, opacity 500ms ease-in;
+    transition: visibility 0s, opacity 300ms ease-in;
+    transition-delay: 200ms;
   }
   .htmx-request .indicator {
     visibility: visible;
@@ -20,6 +21,8 @@
   .indicator-inverse {
     visibility: visible;
     opacity: 1;
+    transition-property: opacity;
+    transition-delay: 100ms;
   }
   .htmx-request .indicator-inverse {
     visibility: hidden;
