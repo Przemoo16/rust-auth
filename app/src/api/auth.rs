@@ -31,7 +31,7 @@ pub fn create_auth_router() -> Router<AppState> {
         .route(
             "/signup",
             get(get_signup)
-                .route_layer(predicate_required!(
+                .layer(predicate_required!(
                     is_anonymous,
                     create_redirect_for_authenticated()
                 ))
@@ -40,7 +40,7 @@ pub fn create_auth_router() -> Router<AppState> {
         .route(
             "/signin",
             get(get_signin)
-                .route_layer(predicate_required!(
+                .layer(predicate_required!(
                     is_anonymous,
                     create_redirect_for_authenticated()
                 ))
