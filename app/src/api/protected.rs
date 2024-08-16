@@ -9,13 +9,11 @@ use tower::ServiceBuilder;
 use crate::api::middleware::set_default_response_headers_for_protected;
 
 pub fn create_protected_router() -> Router<AppState> {
-    Router::new()
-        .route("/protected", get(protected))
-        .route_layer(
-            ServiceBuilder::new()
-                .layer(login_required!(Backend, login_url = SIGNIN_ROUTE))
-                .layer(map_response(set_default_response_headers_for_protected)),
-        )
+    Router::new().route("/protected", get(protected)).layer(
+        ServiceBuilder::new()
+            .layer(login_required!(Backend, login_url = SIGNIN_ROUTE))
+            .layer(map_response(set_default_response_headers_for_protected)),
+    )
 }
 
 #[derive(Template)]

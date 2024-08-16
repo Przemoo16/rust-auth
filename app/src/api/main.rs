@@ -9,7 +9,7 @@ use axum_login::predicate_required;
 pub fn create_main_router() -> Router<AppState> {
     Router::new()
         .route("/", get(home))
-        .route_layer(predicate_required!(
+        .layer(predicate_required!(
             is_anonymous,
             create_redirect_for_authenticated()
         ))
