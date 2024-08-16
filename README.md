@@ -8,3 +8,4 @@
   Add Etag and Last-Modified headers to all resources
   Add hash to css and js resources to make sure that the browser always gets the latest version of the resource
   Support responding with 304 if resource has not changed
+  > **_NOTE:_**  Do I even have to take care of caching if I use the CDN that computes Etag more efficiently?
