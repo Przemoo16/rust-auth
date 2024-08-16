@@ -1,28 +1,28 @@
+use crate::api::middleware::RenderOptions;
+use crate::api::response::create_redirect_for_authenticated;
+use crate::libs::auth::is_anonymous;
 use crate::state::AppState;
-use crate::{api::middleware::RenderOptions, libs::auth::AuthSession};
 use askama_axum::Template;
 use axum::{extract::Extension, http::StatusCode, response::IntoResponse, routing::get, Router};
+use axum_login::predicate_required;
 
 pub fn create_main_router() -> Router<AppState> {
-    Router::new().route("/", get(home))
+    Router::new()
+        .route("/", get(home))
+        .route_layer(predicate_required!(
+            is_anonymous,
+            create_redirect_for_authenticated()
+        ))
 }
 
 #[derive(Template)]
 #[template(path = "pages/home/index.html")]
 struct HomeTemplate {
     options: RenderOptions,
-    is_authenticated: bool,
 }
 
-async fn home(
-    Extension(options): Extension<RenderOptions>,
-    auth_session: AuthSession,
-) -> HomeTemplate {
-    let is_authenticated = auth_session.user.is_some();
-    HomeTemplate {
-        options,
-        is_authenticated,
-    }
+async fn home(Extension(options): Extension<RenderOptions>) -> HomeTemplate {
+    HomeTemplate { options }
 }
 
 #[derive(Template)]

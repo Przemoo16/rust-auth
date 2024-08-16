@@ -1,22 +1,21 @@
 use crate::api::auth::create_auth_router;
-use crate::api::constant::SIGNIN_ROUTE;
 use crate::api::layer::create_auth_layer;
 use crate::api::main::{create_main_router, handler_404};
-use crate::api::middleware::set_render_options;
+use crate::api::middleware::{set_default_response_headers, set_request_render_options};
+use crate::api::protected::create_protected_router;
 use crate::config::Config;
 use crate::db::connection::{Database, SessionStore};
-use crate::libs::auth::Backend;
 use crate::libs::signal::shutdown_signal;
 use crate::state::AppState;
 use axum::{
-    middleware::from_fn,
-    routing::{get, get_service},
+    middleware::{map_request, map_response},
+    routing::get_service,
     Router,
 };
-use axum_login::login_required;
 use std::net::SocketAddr;
 use time::Duration;
 use tokio::{task::spawn, time::Duration as TaskDuration};
+use tower::ServiceBuilder;
 use tower_http::services::ServeDir;
 use tower_sessions::ExpiredDeletion;
 use tracing::info;
@@ -36,19 +35,19 @@ pub async fn run_server(config: ServerConfig) {
     );
     let state = AppState::new(config.db);
     let app = Router::new()
-        .route(
-            "/protected",
-            get(|| async { "Gotta be logged in to see me!" }),
-        )
-        .route_layer(login_required!(Backend, login_url = SIGNIN_ROUTE))
         .nest("/", create_main_router())
         .nest("/", create_auth_router())
-        .fallback(handler_404)
-        .layer(from_fn(set_render_options))
-        .layer(auth_layer)
-        .with_state(state)
+        .nest("/", create_protected_router())
         .nest_service("/styles", get_service(ServeDir::new("dist/styles")))
-        .nest_service("/scripts", get_service(ServeDir::new("scripts")));
+        .nest_service("/scripts", get_service(ServeDir::new("scripts")))
+        .fallback(handler_404)
+        .with_state(state)
+        .layer(
+            ServiceBuilder::new()
+                .layer(auth_layer)
+                .layer(map_request(set_request_render_options))
+                .layer(map_response(set_default_response_headers)),
+        );
     let socket_address = SocketAddr::from(([0, 0, 0, 0], 3000));
     let listener = tokio::net::TcpListener::bind(&socket_address)
         .await

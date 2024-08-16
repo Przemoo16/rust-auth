@@ -2,14 +2,9 @@
 
 {% extends "layouts/home.html" %}
 
+{% block title %}Home{% endblock %}
+
 {% block content %}
-{% if is_authenticated %}
-<button hx-post="/logout" hx-disabled-elt="this"
-  class="btn btn-primary relative">
-  <span class="button-indicator-inverse absolute">Log out</span>
-  {% call button_loader_component::button_loader() %}
-</button>
-{% else %}
 <div hx-target="#page" class="flex items-center justify-center gap-2">
   <a hx-get="/signin" hx-push-url="true"
     class="btn btn-ghost">
@@ -20,5 +15,4 @@
     Sign up
   </a>
 </div>
-{% endif %}
 {% endblock %}

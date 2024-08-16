@@ -1,0 +1,13 @@
+{%- import "components/button-loader.html" as button_loader_component -%}
+
+{% extends "layouts/home.html" %}
+
+{% block title %}Protected{% endblock %}
+
+{% block content %}
+<button hx-post="/logout" hx-disabled-elt="this"
+  class="btn btn-primary relative">
+  <span class="button-indicator-inverse absolute">Log out</span>
+  {% call button_loader_component::button_loader() %}
+</button>
+{% endblock %}

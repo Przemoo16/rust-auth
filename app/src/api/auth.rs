@@ -1,13 +1,11 @@
 use crate::api::constant::{
     EMAIL_IS_ALREADY_TAKEN_MESSAGE, EMAIL_MAX_LENGTH, EMAIL_TOO_LONG_MESSAGE,
-    FIELD_REQUIRED_MESSAGE, HOME_ROUTE, INVALID_CREDENTIALS_MESSAGE, INVALID_EMAIL_MESSAGE,
+    FIELD_REQUIRED_MESSAGE, INVALID_CREDENTIALS_MESSAGE, INVALID_EMAIL_MESSAGE,
     PASSWORD_MAX_LENGTH, PASSWORD_MIN_LENGTH, PASSWORD_MISMATCH_MESSAGE, PASSWORD_TOO_LONG_MESSAGE,
-    PASSWORD_TOO_SHORT_MESSAGE,
+    PASSWORD_TOO_SHORT_MESSAGE, PROTECTED_ROUTE,
 };
 use crate::api::middleware::RenderOptions;
-use crate::api::response::{
-    create_client_side_redirect, create_redirect_for_authenticated, WithCache,
-};
+use crate::api::response::{create_client_side_redirect, create_redirect_for_authenticated};
 use crate::libs::auth::{is_anonymous, AuthSession};
 use crate::libs::validation::is_valid_email;
 use crate::operations::auth::{
@@ -25,6 +23,8 @@ use axum::{
 use axum_login::predicate_required;
 use serde::Deserialize;
 use tracing::error;
+
+use crate::api::constant::HOME_ROUTE;
 
 pub fn create_auth_router() -> Router<AppState> {
     Router::new()
@@ -89,13 +89,11 @@ impl SignupFormErrors<'_> {
     }
 }
 
-async fn get_signup(Extension(options): Extension<RenderOptions>) -> impl IntoResponse {
+async fn get_signup(Extension(options): Extension<RenderOptions>) -> SignupTemplate<'static> {
     SignupTemplate {
         options,
         form_data: SignupFormData::default(),
     }
-    .into_response()
-    .with_cache()
 }
 
 #[derive(Deserialize)]
@@ -130,7 +128,7 @@ async fn post_signup(
     )
     .await
     {
-        Ok(_) => create_client_side_redirect(StatusCode::CREATED, HOME_ROUTE).into_response(),
+        Ok(_) => create_client_side_redirect(StatusCode::CREATED, PROTECTED_ROUTE).into_response(),
         Err(e) => match e {
             SignupError::UserEmailAlreadyExistsError => {
                 let form_data = SignupFormData {
@@ -256,7 +254,6 @@ async fn get_signin(
         },
     }
     .into_response()
-    .with_cache()
 }
 
 #[derive(Deserialize)]
@@ -291,7 +288,7 @@ async fn post_signin(
     .await
     {
         Ok(_) => {
-            let next_url = data.next.as_deref().unwrap_or(HOME_ROUTE);
+            let next_url = data.next.as_deref().unwrap_or(PROTECTED_ROUTE);
             create_client_side_redirect(StatusCode::OK, next_url).into_response()
         }
         Err(e) => match e {

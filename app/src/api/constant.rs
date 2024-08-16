@@ -14,3 +14,4 @@ pub const INVALID_CREDENTIALS_MESSAGE: &str = "Incorrect email or password";
 
 pub const HOME_ROUTE: &str = "/";
 pub const SIGNIN_ROUTE: &str = "/signin";
+pub const PROTECTED_ROUTE: &str = "/protected";
