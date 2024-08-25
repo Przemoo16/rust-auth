@@ -221,6 +221,7 @@ __metadata:
     postcss: "npm:^8.4.40"
     postcss-cli: "npm:^11.0.0"
     tailwindcss: "npm:^3.4.7"
+    uglify-js: "npm:^3.19.2"
   languageName: unknown
   linkType: soft
 
@@ -2339,6 +2340,15 @@ __metadata:
   version: 0.1.13
   resolution: "ts-interface-checker@npm:0.1.13"
   checksum: 10c0/232509f1b84192d07b81d1e9b9677088e590ac1303436da1e92b296e9be8e31ea042e3e1fd3d29b1742ad2c959e95afe30f63117b8f1bc3a3850070a5142fea7
+  languageName: node
+  linkType: hard
+
+"uglify-js@npm:^3.19.2":
+  version: 3.19.2
+  resolution: "uglify-js@npm:3.19.2"
+  bin:
+    uglifyjs: bin/uglifyjs
+  checksum: 10c0/51dbe1304a91cac5daa01f6a2d4ecd545fab7b7d0625e11590b923e95a6d2263b3481dcea974abfc0282b33d2c76f74f1196a992df07eae0847175bc39ea45bb
   languageName: node
   linkType: hard
 

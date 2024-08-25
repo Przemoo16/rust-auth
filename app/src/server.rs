@@ -39,7 +39,7 @@ pub async fn run_server(config: ServerConfig) {
         .nest("/", create_auth_router())
         .nest("/", create_protected_router())
         .nest_service("/styles", get_service(ServeDir::new("dist/styles")))
-        .nest_service("/scripts", get_service(ServeDir::new("scripts")))
+        .nest_service("/scripts", get_service(ServeDir::new("dist/scripts")))
         .fallback(handler_404)
         .with_state(state)
         .layer(
