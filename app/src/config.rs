@@ -54,7 +54,7 @@ impl DatabaseConfig {
 }
 
 fn read_env(key: &str) -> String {
-    var(key).expect(&format!("Couldn't read the {} env variable", key))
+    var(key).expect(&format!("Failed to read the {} env variable", key))
 }
 
 fn decode_base64(string: &str) -> Vec<u8> {

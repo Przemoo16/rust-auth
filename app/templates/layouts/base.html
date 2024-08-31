@@ -14,14 +14,16 @@
       integrity="sha384-QWGpdj554B4ETpJJC9z+ZHJcA/i59TyjxEPXiiUgN2WmTyV5OEZWCD6gQhgkdpB/"
       crossorigin="anonymous">
     </script>
-    <link href="/styles/main.css" rel="stylesheet">
+    <link
+      href="{{ crate::libs::asset::get_asset_path("styles/main.css").expect("Failed to read main.css asset") }}"
+      rel="stylesheet">
   </head>
 
   <body>
     <main id="page">
       {% block layout %}{% endblock %}
     </main>
-    <script src="scripts/main.js"></script>
+    <script src="{{ crate::libs::asset::get_asset_path("scripts/main.js").expect("Failed to read main.js asset") }}"></script>
   </body>
 
 </html>

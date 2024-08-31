@@ -1,7 +1,7 @@
 use sha2::{Digest, Sha256};
 use std::env::args;
 use std::fs::{read_dir, read_to_string, rename, File, OpenOptions};
-use std::io::{Error, Write};
+use std::io::{Result, Write};
 use std::path::PathBuf;
 
 const SOURCE_MAP_FILE_NAME: &str = "source_map.json";
@@ -21,7 +21,7 @@ fn main() {
     let source_map_path = dir.join(SOURCE_MAP_FILE_NAME);
     File::create(&source_map_path).unwrap_or_else(|_| {
         panic!(
-            "Couldn't create a source map file at {}",
+            "Failed to create a source map file at {}",
             source_map_path.display()
         )
     });
@@ -30,36 +30,36 @@ fn main() {
         .open(&source_map_path)
         .unwrap_or_else(|_| {
             panic!(
-                "Couldn't open a source map file at {}",
+                "Failed to open a source map file at {}",
                 source_map_path.display(),
             )
         });
     for entry in DirWalker::new(dir.clone()) {
-        let path = entry.expect("Couldn't read a path");
+        let path = entry.expect("Failed to read a path");
         if path.eq(&source_map_path) {
             continue;
         }
         let content = read_to_string(&path)
-            .unwrap_or_else(|_| panic!("Couldn't read the {} file", path.display()));
+            .unwrap_or_else(|_| panic!("Failed to read the {} file", path.display()));
         let hash = calculate_hash(&content, HASH_LENGTH);
         let path_with_hash = append_hash_to_path(&path, &hash);
         rename(&path, &path_with_hash).unwrap_or_else(|_| {
             panic!(
-                "Couldn't rename the {} file to {}",
+                "Failed to rename the {} file to {}",
                 path.display(),
                 path_with_hash.display()
             )
         });
         let stripped_path = path.strip_prefix(&dir).unwrap_or_else(|_| {
             panic!(
-                "Couldn't strip prefix {} from {}",
+                "Failed to strip prefix {} from {}",
                 dir.display(),
                 path.display()
             )
         });
         let stripped_path_with_hash = path_with_hash.strip_prefix(&dir).unwrap_or_else(|_| {
             panic!(
-                "Couldn't strip prefix {} from {}",
+                "Failed to strip prefix {} from {}",
                 dir.display(),
                 path_with_hash.display()
             )
@@ -73,7 +73,7 @@ fn main() {
         )
         .unwrap_or_else(|_| {
             panic!(
-                "Couldn't add entry to a source map at {}",
+                "Failed to add entry to a source map at {}",
                 source_map_path.display()
             )
         });
@@ -92,7 +92,7 @@ impl DirWalker {
 }
 
 impl Iterator for DirWalker {
-    type Item = Result<PathBuf, Error>;
+    type Item = Result<PathBuf>;
 
     fn next(&mut self) -> Option<Self::Item> {
         while let Some(path) = self.stack.pop() {
@@ -124,7 +124,7 @@ fn calculate_hash(content: &str, length: usize) -> String {
 }
 
 fn append_hash_to_path(path: &PathBuf, hash: &str) -> PathBuf {
-    let mut file_name = hash.to_string();
+    let mut file_name = hash.to_owned();
 
     if let Some(file_stem) = path.file_stem().and_then(|value| value.to_str()) {
         file_name = format!("{}.{}", file_stem, hash);
