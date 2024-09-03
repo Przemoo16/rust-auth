@@ -1,6 +1,8 @@
-use crate::api::{middleware::RenderOptions, response::create_redirect_for_authenticated};
-use crate::libs::auth::is_anonymous;
-use crate::state::AppState;
+use crate::{
+    api::{middleware::RenderOptions, response::create_redirect_for_authenticated},
+    libs::auth::is_anonymous,
+    state::AppState,
+};
 use askama_axum::Template;
 use axum::{extract::Extension, http::StatusCode, response::IntoResponse, routing::get, Router};
 use axum_login::predicate_required;

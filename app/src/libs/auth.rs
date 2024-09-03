@@ -1,10 +1,12 @@
-use crate::db::{
-    connection::Database,
-    user::{get_auth_user_by_email, get_auth_user_by_id, AuthUser, GetUserError},
-};
-use crate::libs::password::{
-    hash_password_in_separate_thread, verify_password_in_separate_thread, HashPasswordError,
-    VerifyPasswordError,
+use crate::{
+    db::{
+        connection::Database,
+        user::{get_auth_user_by_email, get_auth_user_by_id, AuthUser, GetUserError},
+    },
+    libs::password::{
+        hash_password_in_separate_thread, verify_password_in_separate_thread, HashPasswordError,
+        VerifyPasswordError,
+    },
 };
 use async_trait::async_trait;
 use axum_login::{

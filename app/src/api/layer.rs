@@ -1,5 +1,7 @@
-use crate::db::connection::{Database, SessionStore};
-use crate::libs::auth::Backend;
+use crate::{
+    db::connection::{Database, SessionStore},
+    libs::auth::Backend,
+};
 use axum_login::{AuthManagerLayer, AuthManagerLayerBuilder};
 use time::Duration;
 use tower_sessions::{

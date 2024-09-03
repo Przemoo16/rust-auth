@@ -1,7 +1,9 @@
-use app::config::Config;
-use app::db::connection::{setup_db_pool, setup_session_store};
-use app::server::{run_server, ServerConfig};
-use app::tracing::setup_tracing;
+use app::{
+    config::Config,
+    db::connection::{setup_db_pool, setup_session_store},
+    server::{run_server, ServerConfig},
+    tracing::setup_tracing,
+};
 use dotenv::dotenv;
 
 #[tokio::main]

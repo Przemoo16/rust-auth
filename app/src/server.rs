@@ -1,13 +1,15 @@
-use crate::api::{
-    layer::create_auth_layer,
-    main::handler_404,
-    middleware::{set_default_response_headers, set_request_render_options},
-    router::create_api_router,
+use crate::{
+    api::{
+        layer::create_auth_layer,
+        main::handler_404,
+        middleware::{set_default_response_headers, set_request_render_options},
+        router::create_api_router,
+    },
+    config::Config,
+    db::connection::{Database, SessionStore},
+    libs::signal::shutdown_signal,
+    state::AppState,
 };
-use crate::config::Config;
-use crate::db::connection::{Database, SessionStore};
-use crate::libs::signal::shutdown_signal;
-use crate::state::AppState;
 use axum::{
     middleware::{map_request, map_response},
     Router,

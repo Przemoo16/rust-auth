@@ -1,9 +1,11 @@
-use crate::api::{
-    constant::SIGNIN_ROUTE,
-    middleware::{set_default_response_headers_for_protected, RenderOptions},
+use crate::{
+    api::{
+        constant::SIGNIN_ROUTE,
+        middleware::{set_default_response_headers_for_protected, RenderOptions},
+    },
+    libs::auth::Backend,
+    state::AppState,
 };
-use crate::libs::auth::Backend;
-use crate::state::AppState;
 use askama_axum::Template;
 use axum::{extract::Extension, middleware::map_response, routing::get, Router};
 use axum_login::login_required;
