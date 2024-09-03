@@ -2,6 +2,10 @@ use crate::db::{
     connection::Database,
     user::{get_auth_user_by_email, get_auth_user_by_id, AuthUser, GetUserError},
 };
+use crate::libs::password::{
+    hash_password_in_separate_thread, verify_password_in_separate_thread, HashPasswordError,
+    VerifyPasswordError,
+};
 use async_trait::async_trait;
 use axum_login::{
     AuthSession as BaseAuthSession, AuthUser as BaseAuthUser, AuthnBackend, Error as BaseError,
@@ -9,11 +13,6 @@ use axum_login::{
 };
 use std::error::Error;
 use std::fmt::{Display, Formatter, Result as FormatResult};
-
-use crate::libs::password::{
-    hash_password_in_separate_thread, verify_password_in_separate_thread, HashPasswordError,
-    VerifyPasswordError,
-};
 
 #[derive(Clone)]
 pub struct Backend {

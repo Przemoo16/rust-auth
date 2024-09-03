@@ -1,9 +1,8 @@
+use crate::api::constant::PROTECTED_ROUTE;
 use axum::{
     http::StatusCode,
     response::{IntoResponse, Redirect},
 };
-
-use crate::api::constant::PROTECTED_ROUTE;
 
 const PAGE_CONTENT_SELECTOR: &str = "#page";
 

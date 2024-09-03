@@ -1,9 +1,9 @@
-use crate::api::asset::create_assets_router;
-use crate::api::auth::create_auth_router;
-use crate::api::layer::create_auth_layer;
-use crate::api::main::{create_main_router, handler_404};
-use crate::api::middleware::{set_default_response_headers, set_request_render_options};
-use crate::api::protected::create_protected_router;
+use crate::api::{
+    layer::create_auth_layer,
+    main::handler_404,
+    middleware::{set_default_response_headers, set_request_render_options},
+    router::create_api_router,
+};
 use crate::config::Config;
 use crate::db::connection::{Database, SessionStore};
 use crate::libs::signal::shutdown_signal;
@@ -34,10 +34,7 @@ pub async fn run_server(config: ServerConfig) {
     );
     let state = AppState::new(config.db);
     let app = Router::new()
-        .nest("/", create_main_router())
-        .nest("/", create_auth_router())
-        .nest("/", create_protected_router())
-        .nest("/", create_assets_router())
+        .nest("/", create_api_router())
         .fallback(handler_404)
         .with_state(state)
         .layer(

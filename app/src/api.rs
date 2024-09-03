@@ -6,3 +6,4 @@ pub mod main;
 pub mod middleware;
 pub mod protected;
 pub mod response;
+pub mod router;

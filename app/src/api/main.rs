@@ -1,5 +1,4 @@
-use crate::api::middleware::RenderOptions;
-use crate::api::response::create_redirect_for_authenticated;
+use crate::api::{middleware::RenderOptions, response::create_redirect_for_authenticated};
 use crate::libs::auth::is_anonymous;
 use crate::state::AppState;
 use askama_axum::Template;

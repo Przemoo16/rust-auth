@@ -1,12 +1,13 @@
-use crate::api::{constant::SIGNIN_ROUTE, middleware::RenderOptions};
+use crate::api::{
+    constant::SIGNIN_ROUTE,
+    middleware::{set_default_response_headers_for_protected, RenderOptions},
+};
 use crate::libs::auth::Backend;
 use crate::state::AppState;
 use askama_axum::Template;
 use axum::{extract::Extension, middleware::map_response, routing::get, Router};
 use axum_login::login_required;
 use tower::ServiceBuilder;
-
-use crate::api::middleware::set_default_response_headers_for_protected;
 
 pub fn create_protected_router() -> Router<AppState> {
     Router::new().route("/protected", get(protected)).layer(

@@ -1,13 +1,17 @@
-use crate::api::constant::{
-    EMAIL_IS_ALREADY_TAKEN_MESSAGE, EMAIL_MAX_LENGTH, EMAIL_TOO_LONG_MESSAGE,
-    FIELD_REQUIRED_MESSAGE, INVALID_CREDENTIALS_MESSAGE, INVALID_EMAIL_MESSAGE,
-    PASSWORD_MAX_LENGTH, PASSWORD_MIN_LENGTH, PASSWORD_MISMATCH_MESSAGE, PASSWORD_TOO_LONG_MESSAGE,
-    PASSWORD_TOO_SHORT_MESSAGE, PROTECTED_ROUTE,
+use crate::api::{
+    constant::{
+        EMAIL_IS_ALREADY_TAKEN_MESSAGE, EMAIL_MAX_LENGTH, EMAIL_TOO_LONG_MESSAGE,
+        FIELD_REQUIRED_MESSAGE, HOME_ROUTE, INVALID_CREDENTIALS_MESSAGE, INVALID_EMAIL_MESSAGE,
+        PASSWORD_MAX_LENGTH, PASSWORD_MIN_LENGTH, PASSWORD_MISMATCH_MESSAGE,
+        PASSWORD_TOO_LONG_MESSAGE, PASSWORD_TOO_SHORT_MESSAGE, PROTECTED_ROUTE,
+    },
+    middleware::RenderOptions,
+    response::{create_client_side_redirect, create_redirect_for_authenticated},
 };
-use crate::api::middleware::RenderOptions;
-use crate::api::response::{create_client_side_redirect, create_redirect_for_authenticated};
-use crate::libs::auth::{is_anonymous, AuthSession};
-use crate::libs::validation::is_valid_email;
+use crate::libs::{
+    auth::{is_anonymous, AuthSession},
+    validation::is_valid_email,
+};
 use crate::operations::auth::{
     log_out, sign_in, sign_up, SigninData, SigninError, SignupData, SignupError,
 };
@@ -23,8 +27,6 @@ use axum::{
 use axum_login::predicate_required;
 use serde::Deserialize;
 use tracing::error;
-
-use crate::api::constant::HOME_ROUTE;
 
 pub fn create_auth_router() -> Router<AppState> {
     Router::new()
