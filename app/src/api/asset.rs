@@ -18,8 +18,8 @@ static ASSET_WITH_ETAG_REGEX: Lazy<Regex> =
 
 pub fn create_assets_router() -> Router<AppState> {
     Router::new()
-        .route("/styles", get(serve_styles))
-        .route("/scripts", get(serve_scripts))
+        .nest_service("/styles", get(serve_styles))
+        .nest_service("/scripts", get(serve_scripts))
 }
 
 async fn serve_styles(request: Request) -> impl IntoResponse {
