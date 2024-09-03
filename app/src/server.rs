@@ -1,3 +1,4 @@
+use crate::api::asset::create_assets_router;
 use crate::api::auth::create_auth_router;
 use crate::api::layer::create_auth_layer;
 use crate::api::main::{create_main_router, handler_404};
@@ -9,14 +10,12 @@ use crate::libs::signal::shutdown_signal;
 use crate::state::AppState;
 use axum::{
     middleware::{map_request, map_response},
-    routing::get_service,
     Router,
 };
 use std::net::SocketAddr;
 use time::Duration;
 use tokio::{task::spawn, time::Duration as TaskDuration};
 use tower::ServiceBuilder;
-use tower_http::services::ServeDir;
 use tower_sessions::ExpiredDeletion;
 use tracing::info;
 
@@ -38,8 +37,7 @@ pub async fn run_server(config: ServerConfig) {
         .nest("/", create_main_router())
         .nest("/", create_auth_router())
         .nest("/", create_protected_router())
-        .nest_service("/styles", get_service(ServeDir::new("dist/styles")))
-        .nest_service("/scripts", get_service(ServeDir::new("dist/scripts")))
+        .nest("/", create_assets_router())
         .fallback(handler_404)
         .with_state(state)
         .layer(
