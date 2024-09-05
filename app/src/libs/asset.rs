@@ -1,6 +1,8 @@
 use once_cell::sync::Lazy;
-use std::collections::HashMap;
-use std::io::{Error, ErrorKind, Result};
+use std::{
+    collections::HashMap,
+    io::{Error, ErrorKind, Result},
+};
 
 const SOURCE_MAP_DELIMETER: &str = ";";
 

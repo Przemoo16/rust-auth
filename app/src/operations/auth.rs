@@ -8,8 +8,10 @@ use crate::{
         password::{hash_password_in_separate_thread, HashPasswordError},
     },
 };
-use std::error::Error;
-use std::fmt::{Display, Formatter, Result as FormatResult};
+use std::{
+    error::Error,
+    fmt::{Display, Formatter, Result as FormatResult},
+};
 
 pub struct SignupData<'a> {
     pub email: &'a str,

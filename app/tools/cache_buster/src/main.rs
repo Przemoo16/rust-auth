@@ -1,8 +1,10 @@
 use sha2::{Digest, Sha256};
-use std::env::args;
-use std::fs::{read_dir, read_to_string, rename, File, OpenOptions};
-use std::io::{Result, Write};
-use std::path::PathBuf;
+use std::{
+    env::args,
+    fs::{read_dir, read_to_string, rename, File, OpenOptions},
+    io::{Result, Write},
+    path::PathBuf,
+};
 
 const SOURCE_MAP_FILE_NAME: &str = "source_map.json";
 const SOURCE_MAP_DELIMETER: &str = ";";

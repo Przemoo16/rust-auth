@@ -1,7 +1,9 @@
 use crate::db::connection::Database;
 use sqlx::{query_as, Error as SqlxError};
-use std::error::Error;
-use std::fmt::{Debug as FormatDebug, Display, Formatter, Result as FormatResult};
+use std::{
+    error::Error,
+    fmt::{Debug as FormatDebug, Display, Formatter, Result as FormatResult},
+};
 
 #[derive(Clone)]
 pub struct AuthUser {

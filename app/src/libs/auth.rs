@@ -13,8 +13,10 @@ use axum_login::{
     AuthSession as BaseAuthSession, AuthUser as BaseAuthUser, AuthnBackend, Error as BaseError,
     UserId,
 };
-use std::error::Error;
-use std::fmt::{Display, Formatter, Result as FormatResult};
+use std::{
+    error::Error,
+    fmt::{Display, Formatter, Result as FormatResult},
+};
 
 #[derive(Clone)]
 pub struct Backend {

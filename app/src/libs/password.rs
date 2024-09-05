@@ -5,8 +5,10 @@ use argon2::{
     },
     Argon2,
 };
-use std::error::Error;
-use std::fmt::{Display, Formatter, Result as FormatResult};
+use std::{
+    error::Error,
+    fmt::{Display, Formatter, Result as FormatResult},
+};
 use tokio::task::{spawn_blocking, JoinError};
 
 #[derive(Debug)]
