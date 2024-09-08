@@ -11,7 +11,7 @@ use regex::Regex;
 use tower::ServiceExt;
 use tower_http::services::ServeDir;
 
-const ASSETS_CACHE_CONTROL_HEADER: &str = "public, max-age=31536000, immutable";
+const ASSET_CACHE_CONTROL_HEADER: &str = "public, max-age=31536000, immutable";
 
 static ASSET_WITH_ETAG_REGEX: Lazy<Regex> =
     Lazy::new(|| Regex::new(r"^[^.]+\.(?P<etag>[^.]+)\.[^.]+$").expect("Wrong regex pattern"));
@@ -37,7 +37,7 @@ async fn serve_dir(path: &str, request: Request) -> impl IntoResponse {
         if let Some(etag) = extracted_etag {
             response.headers_mut().insert(
                 CACHE_CONTROL,
-                ASSETS_CACHE_CONTROL_HEADER
+                ASSET_CACHE_CONTROL_HEADER
                     .parse()
                     .expect("Invalid header value"),
             );
