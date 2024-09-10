@@ -14,7 +14,7 @@ use crate::{
         validation::is_valid_email,
     },
     operations::auth::{
-        log_out, sign_in, sign_up, SigninData, SigninError, SignupData, SignupError,
+        sign_out, sign_in, sign_up, SigninData, SigninError, SignupData, SignupError,
     },
     state::AppState,
 };
@@ -50,7 +50,7 @@ pub fn create_auth_router() -> Router<AppState> {
                 ))
                 .post(post_signin),
         )
-        .route("/logout", post(post_logout))
+        .route("/signout", post(post_signout))
 }
 
 #[derive(Template)]
@@ -350,11 +350,11 @@ fn validate_signin_request(data: &SigninRequest) -> Result<(), SigninFormData> {
     })
 }
 
-async fn post_logout(mut auth_session: AuthSession) -> impl IntoResponse {
-    match log_out(&mut auth_session).await {
+async fn post_signout(mut auth_session: AuthSession) -> impl IntoResponse {
+    match sign_out(&mut auth_session).await {
         Ok(_) => create_client_side_redirect(StatusCode::NO_CONTENT, HOME_ROUTE).into_response(),
         Err(e) => {
-            error!("Failed to log out: {:?}", e);
+            error!("Failed to sign out: {:?}", e);
             StatusCode::INTERNAL_SERVER_ERROR.into_response()
         }
     }

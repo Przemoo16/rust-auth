@@ -5,9 +5,9 @@
 {% block title %}Protected{% endblock %}
 
 {% block content %}
-<button hx-post="/logout" hx-disabled-elt="this"
+<button hx-post="/signout" hx-disabled-elt="this"
   class="btn btn-primary relative">
-  <span class="button-indicator-inverse absolute">Log out</span>
+  <span class="button-indicator-inverse absolute">Sign out</span>
   {% call button_loader_component::button_loader() %}
 </button>
 {% endblock %}

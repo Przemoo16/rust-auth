@@ -119,23 +119,23 @@ pub async fn sign_in(data: SigninData, auth_session: &mut AuthSession) -> Result
 }
 
 #[derive(Debug)]
-pub struct LogoutError(AuthError);
+pub struct SignoutError(AuthError);
 
-impl Error for LogoutError {}
+impl Error for SignoutError {}
 
-impl Display for LogoutError {
+impl Display for SignoutError {
     fn fmt(&self, f: &mut Formatter<'_>) -> FormatResult {
-        write!(f, "Logout error: {}", self.0)
+        write!(f, "Signout error: {}", self.0)
     }
 }
 
-impl From<AuthError> for LogoutError {
+impl From<AuthError> for SignoutError {
     fn from(value: AuthError) -> Self {
-        LogoutError(value)
+        SignoutError(value)
     }
 }
 
-pub async fn log_out(auth_session: &mut AuthSession) -> Result<(), LogoutError> {
+pub async fn sign_out(auth_session: &mut AuthSession) -> Result<(), SignoutError> {
     auth_session.logout().await?;
     Ok(())
 }
