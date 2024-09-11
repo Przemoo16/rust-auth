@@ -1,12 +1,9 @@
-{%- import "components/page-loader.html" as page_loader_component -%}
-
 {% extends "layouts/base.html" %}
 
 {% block layout %}
 <div class="flex min-h-screen items-center justify-center bg-base-200 relative">
-  {% call page_loader_component::page_loader() %}
   <div
-    class="page-indicator-inverse card w-11/12 max-w-md bg-base-100 shadow-2xl absolute">
+    class="card w-11/12 max-w-md bg-base-100 shadow-2xl absolute">
     <div class="card-body gap-5">
       {% block content %}{% endblock %}
     </div>

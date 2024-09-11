@@ -6,20 +6,13 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>{% block title %}{% endblock %} - MySite</title>
-    {#
-    FIXME: Do not use CDNs on production:
-    https://blog.wesleyac.com/posts/why-not-javascript-cdn
-    #}
-    <script src="https://unpkg.com/htmx.org@2.0.1"
-      integrity="sha384-QWGpdj554B4ETpJJC9z+ZHJcA/i59TyjxEPXiiUgN2WmTyV5OEZWCD6gQhgkdpB/"
-      crossorigin="anonymous">
-    </script>
+    <script src="{{ crate::libs::asset::get_asset_path("scripts/htmx.js").expect("Failed to read htmx.js asset") }}"></script>
     <link
       href="{{ crate::libs::asset::get_asset_path("styles/main.css").expect("Failed to read main.css asset") }}"
       rel="stylesheet">
   </head>
 
-  <body>
+  <body hx-ext="loading-states">
     <main id="page">
       {% block layout %}{% endblock %}
     </main>

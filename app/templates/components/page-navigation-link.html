@@ -1,0 +1,6 @@
+{% macro page_navigation_link(text, url) %}
+<a hx-get="{{ url }}" hx-target="#page" hx-push-url="true" data-loading-states
+  class="link-hover link link-primary">
+  {{ text }}
+</a>
+{% endmacro %}

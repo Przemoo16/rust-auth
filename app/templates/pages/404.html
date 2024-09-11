@@ -1,11 +1,14 @@
+{%- import "components/page-navigation-button.html" as page_navigation_button_component -%}
+
 {% extends "layouts/home.html" %}
 
 {% block title %}404{% endblock %}
 
 {% block content %}
 <h1 class="text-center text-2xl font-bold">404</h1>
-<a hx-get="/" hx-target="#page" hx-push-url="true"
-  class="btn btn-primary">
-  Home
-</a>
+{% call page_navigation_button_component::page_navigation_button(
+  text="Home",
+  url="/",
+  class="btn-primary"
+) %}
 {% endblock %}

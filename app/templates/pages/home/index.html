@@ -1,18 +1,20 @@
-{%- import "components/button-loader.html" as button_loader_component -%}
+{%- import "components/page-navigation-button.html" as page_navigation_button_component -%}
 
 {% extends "layouts/home.html" %}
 
 {% block title %}Home{% endblock %}
 
 {% block content %}
-<div hx-target="#page" class="flex items-center justify-center gap-2">
-  <a hx-get="/signin" hx-push-url="true"
-    class="btn btn-ghost">
-    Sign in
-  </a>
-  <a hx-get="/signup" hx-push-url="true"
-    class="btn btn-outline btn-primary">
-    Sign up
-  </a>
+<div class="flex items-center justify-center gap-2">
+  {% call page_navigation_button_component::page_navigation_button(
+    text="Sign in",
+    url="/signin",
+    class="btn-ghost"
+  ) %}
+  {% call page_navigation_button_component::page_navigation_button(
+    text="Sign up",
+    url="/signup",
+    class="btn-outline btn-primary"
+  ) %}
 </div>
 {% endblock %}

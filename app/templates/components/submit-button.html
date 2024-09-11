@@ -5,9 +5,10 @@
   text,
   class
 ) %}
-<button id="{{ id }}" type="submit"
+<button id="{{ id }}" type="submit" data-loading-disable
   class="btn btn-primary relative{% if !class.is_empty() %} {{ class }}{% endif %}">
-  <span class="button-indicator-inverse absolute">{{ text }}</span>
+  <span data-loading-class="invisible opacity-0"
+    class="absolute">{{ text }}</span>
   {% call button_loader_component::button_loader() %}
 </button>
 {% endmacro %}

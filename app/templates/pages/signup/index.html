@@ -1,3 +1,5 @@
+{%- import "components/page-navigation-link.html" as page_navigation_link_component -%}
+
 {% extends "layouts/auth.html" %}
 
 {% block title %}Sign Up{% endblock %}
@@ -5,8 +7,5 @@
 {% block content %}
 <h1 class="text-center text-2xl font-bold">Sign up</h1>
 {% include "form.html" %}
-<a hx-get="/signin" hx-target="#page" hx-push-url="true"
-  class="link-hover link link-primary">
-  Already have an account?
-</a>
+{% call page_navigation_link_component::page_navigation_link(text="Already have an account?", url="/signin") %}
 {% endblock %}

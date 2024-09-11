@@ -1,0 +1,6 @@
+{% macro page_navigation_button(text, url, class) %}
+<a hx-get="{{ url }}" hx-target="#page" hx-push-url="true" data-loading-states
+  class="btn{% if !class.is_empty() %} {{ class }}{% endif %}">
+  {{ text }}
+</a>
+{% endmacro %}

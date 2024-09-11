@@ -1,7 +1,7 @@
 {%- import "components/submit-button.html" as submit_button_component -%}
 {%- import "components/text-input.html" as text_input_component -%}
 
-<form hx-post="/signup" hx-swap="outerHTML" hx-disabled-elt="#submit" novalidate
+<form hx-post="/signup" hx-swap="outerHTML" data-loading-states novalidate
   class="flex flex-col gap-2">
   {% call text_input_component::text_input(
     name="email",
