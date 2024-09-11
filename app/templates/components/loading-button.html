@@ -13,9 +13,9 @@
     class="btn btn-primary w-full relative{% if !class.is_empty() %} {{ class }}{% endif %}">
     <span data-loading-class="invisible opacity-0"
       class="absolute">{{ text }}</span>
-    <span data-loading-class="visible opacity-100"
+    <span aria-label="loading" data-loading-class="visible opacity-100"
       data-loading-class-remove="invisible opacity-0"
-      class="loading loading-dots absolute invisible opacity-0"></span>
+      class="loading loading-dots absolute transition-opacity duration-500 ease-in invisible opacity-0"></span>
   </button>
 </div>
 {% endmacro %}
