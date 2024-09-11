@@ -1,4 +1,4 @@
-{%- import "components/submit-button.html" as submit_button_component -%}
+{%- import "components/loading-button.html" as loading_button_component -%}
 {%- import "components/text-input.html" as text_input_component -%}
 
 <form hx-post="/signup" hx-swap="outerHTML" data-loading-states novalidate
@@ -33,9 +33,10 @@
     autofocus=SignupFormField::ConfirmPassword==form_data.focus,
     error=form_data.errors.confirm_password
   ) %}
-  {% call submit_button_component::submit_button(
-    id="submit",
+  {% call loading_button_component::loading_button(
     text="Sign up",
-    class="mt-3"
+    button_type="submit",
+    post="",
+    class="mt-3",
   ) %}
 </form>

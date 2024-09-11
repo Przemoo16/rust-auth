@@ -1,14 +1,14 @@
-{%- import "components/button-loader.html" as button_loader_component -%}
+{%- import "components/loading-button.html" as loading_button_component -%}
 
 {% extends "layouts/home.html" %}
 
 {% block title %}Protected{% endblock %}
 
 {% block content %}
-<button hx-post="/signout" data-loading-states data-loading-disable
-  class="btn btn-primary relative">
-  <span data-loading-class="invisible opacity-0" class="absolute">Sign
-    out</span>
-  {% call button_loader_component::button_loader() %}
-</button>
+{% call loading_button_component::loading_button(
+  text="Sign out",
+  button_type="button",
+  post="/signout",
+  class="",
+) %}
 {% endblock %}

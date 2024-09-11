@@ -1,0 +1,19 @@
+{% macro loading_button(
+  text,
+  button_type,
+  class,
+  post,
+) %}
+<button type="{{ button_type }}"
+  {% if !post.is_empty() %}
+  hx-post="{{ post }}"
+  {% endif %}
+  data-loading-states data-loading-disable
+  class="btn btn-primary relative{% if !class.is_empty() %} {{ class }}{% endif %}">
+  <span data-loading-class="invisible opacity-0"
+    class="absolute">{{ text }}</span>
+  <span data-loading-class="visible opacity-100"
+    data-loading-class-remove="invisible opacity-0"
+    class="loading loading-dots absolute invisible opacity-0"></span>
+</button>
+{% endmacro %}
