@@ -1,0 +1,13 @@
+{%- import "components/loading-button.html" as loading_button_component -%}
+
+{% macro submit_button(
+  text,
+  class,
+) %}
+{% call loading_button_component::loading_button(
+  text=text,
+  button_type="submit",
+  post="",
+  class=class,
+) %}
+{% endmacro %}
