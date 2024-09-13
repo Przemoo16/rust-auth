@@ -5,7 +5,7 @@
   <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>{% block title %}{% endblock %} - MySite</title>
+    <title>{% block title %}{% endblock +%} - MySite</title>
     <script src="{{ crate::libs::asset::get_asset_path("scripts/htmx.js").expect("Failed to read htmx.js asset") }}"></script>
     <link
       href="{{ crate::libs::asset::get_asset_path("styles/main.css").expect("Failed to read main.css asset") }}"
@@ -21,6 +21,6 @@
 
 </html>
 {% else %}
-<title>{% block title %}{% endblock %} - MySite</title>
+<title>{% block title %}{% endblock +%} - MySite</title>
 {% block layout %}{% endblock %}
 {% endif %}

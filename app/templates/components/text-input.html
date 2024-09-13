@@ -12,22 +12,16 @@
   <div class="label">
     <span class="label-text">
       {{ label }}
-      {% if required %}
-      <span class="text-error">*</span>
-      {% endif %}
+      {% if required +%} <span class="text-error">*</span> {% endif %}
     </span>
   </div>
   <input id="{{ name }}" name="{{ name }}" type="{{ input_type }}"
     value="{{ value }}" placeholder="{{ placeholder }}"
-    {% if required %}
-    required
-    {% endif %}
-    {% if autofocus %}
-    autofocus
-    {% endif %}
+    {% if required +%} required {% endif +%}
+    {%+ if autofocus %} autofocus {%+ endif %}
     aria-errormessage="{{ name }}-error"
     aria-invalid="{{ error.is_some() }}"
-    class="input input-bordered{% if error.is_some() %} input-error{% endif %}" />
+    class="input input-bordered {% if error.is_some() +%} input-error {% endif %}" />
   {% if let Some(error) = error %}
   <p id="{{ name }}-error" class="mt-2 text-error">{{ error }}</p>
   {% endif %}

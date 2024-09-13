@@ -6,11 +6,9 @@
 ) %}
 <div data-loading-states class="flex items-center justify-center">
   <button type="{{ button_type }}"
-    {% if !post.is_empty() %}
-    hx-post="{{ post }}"
-    {% endif %}
+    {% if !post.is_empty() +%} hx-post="{{ post }}" {% endif +%}
     data-loading-disable
-    class="btn btn-primary w-full relative{% if !class.is_empty() %} {{ class }}{% endif %}">
+    class="btn btn-primary w-full relative {% if !class.is_empty() +%} {{+ class }} {% endif %}">
     <span data-loading-class="invisible opacity-0"
       class="absolute">{{ text }}</span>
     <span aria-label="loading" data-loading-class="visible opacity-100"
