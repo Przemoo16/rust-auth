@@ -9,8 +9,8 @@ use axum::Router;
 
 pub fn create_api_router() -> Router<AppState> {
     Router::new()
-        .nest("/", create_main_router())
-        .nest("/", create_auth_router())
-        .nest("/", create_protected_router())
-        .nest("/", create_assets_router())
+        .merge(create_main_router())
+        .merge(create_auth_router())
+        .merge(create_protected_router())
+        .merge(create_assets_router())
 }

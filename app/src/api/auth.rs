@@ -14,7 +14,7 @@ use crate::{
         validation::is_valid_email,
     },
     operations::auth::{
-        sign_out, sign_in, sign_up, SigninData, SigninError, SignupData, SignupError,
+        sign_in, sign_out, sign_up, SigninData, SigninError, SignupData, SignupError,
     },
     state::AppState,
 };
