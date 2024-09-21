@@ -34,16 +34,18 @@ async fn serve_dir(path: &str, request: Request) -> impl IntoResponse {
     let extracted_etag = extract_etag(request.uri().path()).map(|hash| hash.to_owned());
     let result = ServeDir::new(path).oneshot(request).await;
     result.map(|mut response| {
-        if let Some(etag) = extracted_etag {
-            response.headers_mut().insert(
-                CACHE_CONTROL,
-                ASSET_CACHE_CONTROL_HEADER
-                    .parse()
-                    .expect("Invalid header value"),
-            );
-            response
-                .headers_mut()
-                .insert(ETAG, etag.parse().expect("Invalid header value"));
+        if response.status().is_success() {
+            if let Some(etag) = extracted_etag {
+                response.headers_mut().insert(
+                    CACHE_CONTROL,
+                    ASSET_CACHE_CONTROL_HEADER
+                        .parse()
+                        .expect("Invalid header value"),
+                );
+                response
+                    .headers_mut()
+                    .insert(ETAG, etag.parse().expect("Invalid header value"));
+            }
         }
         response
     })

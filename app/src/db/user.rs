@@ -110,3 +110,20 @@ pub async fn get_auth_user_by_email(
     .await?;
     Ok(user)
 }
+
+#[cfg(test)]
+mod tests {
+    use super::AuthUser;
+
+    #[test]
+    fn test_user_password_is_not_logged() {
+        let user = AuthUser {
+            id: 1,
+            password: String::from("password123"),
+        };
+
+        let log = format!("{:?}", user);
+
+        assert!(!log.contains("password123"));
+    }
+}
