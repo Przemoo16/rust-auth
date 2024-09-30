@@ -106,11 +106,7 @@ async fn get_signup_page_redirect_on_authenticated(db: Database) {
 #[sqlx::test]
 async fn sign_up(db: Database) {
     let router = create_test_router(db).await;
-    let payload = SignupPayload {
-        email: "test@example.com",
-        password: "password123",
-        confirm_password: "password123",
-    };
+    let payload = SignupPayload::default();
 
     let signup_response = router
         .clone()
@@ -142,7 +138,7 @@ async fn sign_up(db: Database) {
 }
 
 #[sqlx::test]
-async fn sign_up_with_invalid_email_request(db: Database) {
+async fn sign_up_with_invalid_email_payload(db: Database) {
     let router = create_test_router(db).await;
     let cases = [
         "",
@@ -174,7 +170,7 @@ async fn sign_up_with_invalid_email_request(db: Database) {
 }
 
 #[sqlx::test]
-async fn sign_up_with_invalid_password_request(db: Database) {
+async fn sign_up_with_invalid_password_payload(db: Database) {
     let router = create_test_router(db).await;
     let cases = ["", "a", &"a".repeat(257)];
 
@@ -203,7 +199,7 @@ async fn sign_up_with_invalid_password_request(db: Database) {
 }
 
 #[sqlx::test]
-async fn sign_up_with_invalid_confirm_password_request(db: Database) {
+async fn sign_up_with_invalid_confirm_password_payload(db: Database) {
     let router = create_test_router(db).await;
     let cases = ["", "mismatched-confirm-password"];
 
@@ -364,7 +360,7 @@ async fn sign_in(db: Database) {
 }
 
 #[sqlx::test]
-async fn sign_in_with_invalid_email_request(db: Database) {
+async fn sign_in_with_invalid_email_payload(db: Database) {
     let router = create_test_router(db).await;
     let cases = ["", "invalid-email"];
 
@@ -392,7 +388,7 @@ async fn sign_in_with_invalid_email_request(db: Database) {
 }
 
 #[sqlx::test]
-async fn sign_in_with_invalid_password_request(db: Database) {
+async fn sign_in_with_invalid_password_payload(db: Database) {
     let router = create_test_router(db).await;
     let payload = SigninPayload {
         password: "",
