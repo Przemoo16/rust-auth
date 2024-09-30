@@ -14,7 +14,6 @@ use axum::{
     Router,
 };
 use mime::{APPLICATION_WWW_FORM_URLENCODED, TEXT_HTML_UTF_8};
-use std::collections::HashMap;
 use tower::ServiceExt;
 use urlencoding::encode;
 
@@ -35,18 +34,13 @@ pub fn is_html_response(response: &Response) -> bool {
         })
 }
 
-pub fn create_form_data(data: &HashMap<&str, &str>) -> String {
-    data.into_iter()
-        .map(|(key, value)| format!("{}={}", encode(key), encode(value)))
-        .collect::<Vec<String>>()
-        .join("&")
-}
-
 pub async fn get_authenticated_user_cookie(router: Router) -> HeaderValue {
-    let mut data = HashMap::new();
-    data.insert("email", "test@example.pl");
-    data.insert("password", "password123");
-    data.insert("confirm_password", "password123");
+    let form_data = format!(
+        "email={}&password={}&confirm_password={}",
+        encode("test@example.com"),
+        encode("password123"),
+        encode("password123")
+    );
 
     let response = router
         .oneshot(
@@ -54,7 +48,7 @@ pub async fn get_authenticated_user_cookie(router: Router) -> HeaderValue {
                 .method(Method::POST)
                 .uri("/signup")
                 .header(CONTENT_TYPE, APPLICATION_WWW_FORM_URLENCODED.as_ref())
-                .body(Body::from(create_form_data(&data)))
+                .body(Body::from(form_data))
                 .unwrap(),
         )
         .await

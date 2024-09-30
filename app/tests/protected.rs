@@ -9,7 +9,7 @@ use axum::{
 };
 use tower::ServiceExt;
 
-mod common;
+pub mod common;
 use common::{create_test_router, get_authenticated_user_cookie, is_html_response};
 
 #[sqlx::test]

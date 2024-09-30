@@ -8,27 +8,61 @@ use axum::{
     },
 };
 use mime::APPLICATION_WWW_FORM_URLENCODED;
-use std::collections::HashMap;
 use tower::ServiceExt;
+use urlencoding::encode;
 
-mod common;
-use common::{
-    create_form_data, create_test_router, get_authenticated_user_cookie, is_html_response,
-};
+pub mod common;
+use common::{create_test_router, get_authenticated_user_cookie, is_html_response};
 
-fn create_signup_data() -> HashMap<&'static str, &'static str> {
-    let mut data = HashMap::new();
-    data.insert("email", "test@example.pl");
-    data.insert("password", "password123");
-    data.insert("confirm_password", "password123");
-    data
+struct SignupPayload<'a> {
+    email: &'a str,
+    password: &'a str,
+    confirm_password: &'a str,
 }
 
-fn create_signin_data() -> HashMap<&'static str, &'static str> {
-    let mut data = HashMap::new();
-    data.insert("email", "test@example.pl");
-    data.insert("password", "password123");
-    data
+impl<'a> Default for SignupPayload<'a> {
+    fn default() -> Self {
+        Self {
+            email: "test@example.com",
+            password: "password123",
+            confirm_password: "password123",
+        }
+    }
+}
+
+impl<'a> SignupPayload<'a> {
+    fn to_form_data(&self) -> String {
+        format!(
+            "email={}&password={}&confirm_password={}",
+            encode(self.email),
+            encode(self.password),
+            encode(self.confirm_password)
+        )
+    }
+}
+
+struct SigninPayload<'a> {
+    email: &'a str,
+    password: &'a str,
+}
+
+impl<'a> Default for SigninPayload<'a> {
+    fn default() -> Self {
+        Self {
+            email: "test@example.com",
+            password: "password123",
+        }
+    }
+}
+
+impl<'a> SigninPayload<'a> {
+    fn to_form_data(&self) -> String {
+        format!(
+            "email={}&password={}",
+            encode(self.email),
+            encode(self.password),
+        )
+    }
 }
 
 #[sqlx::test]
@@ -72,10 +106,11 @@ async fn get_signup_page_redirect_on_authenticated(db: Database) {
 #[sqlx::test]
 async fn sign_up(db: Database) {
     let router = create_test_router(db).await;
-    let mut data = HashMap::new();
-    data.insert("email", "test@example.pl");
-    data.insert("password", "password123");
-    data.insert("confirm_password", "password123");
+    let payload = SignupPayload {
+        email: "test@example.com",
+        password: "password123",
+        confirm_password: "password123",
+    };
 
     let signup_response = router
         .clone()
@@ -84,7 +119,7 @@ async fn sign_up(db: Database) {
                 .method(Method::POST)
                 .uri("/signup")
                 .header(CONTENT_TYPE, APPLICATION_WWW_FORM_URLENCODED.as_ref())
-                .body(Body::from(create_form_data(&data)))
+                .body(Body::from(payload.to_form_data()))
                 .unwrap(),
         )
         .await
@@ -116,8 +151,10 @@ async fn sign_up_with_invalid_email_request(db: Database) {
     ];
 
     for case in cases {
-        let mut data = create_signup_data();
-        data.insert("email", case);
+        let payload = SignupPayload {
+            email: case,
+            ..Default::default()
+        };
 
         let response = router
             .clone()
@@ -126,7 +163,7 @@ async fn sign_up_with_invalid_email_request(db: Database) {
                     .method(Method::POST)
                     .uri("/signup")
                     .header(CONTENT_TYPE, APPLICATION_WWW_FORM_URLENCODED.as_ref())
-                    .body(Body::from(create_form_data(&data)))
+                    .body(Body::from(payload.to_form_data()))
                     .unwrap(),
             )
             .await
@@ -142,9 +179,11 @@ async fn sign_up_with_invalid_password_request(db: Database) {
     let cases = ["", "a", &"a".repeat(257)];
 
     for case in cases {
-        let mut data = create_signup_data();
-        data.insert("password", case);
-        data.insert("confirm_password", case);
+        let payload = SignupPayload {
+            password: case,
+            confirm_password: case,
+            ..Default::default()
+        };
 
         let response = router
             .clone()
@@ -153,7 +192,7 @@ async fn sign_up_with_invalid_password_request(db: Database) {
                     .method(Method::POST)
                     .uri("/signup")
                     .header(CONTENT_TYPE, APPLICATION_WWW_FORM_URLENCODED.as_ref())
-                    .body(Body::from(create_form_data(&data)))
+                    .body(Body::from(payload.to_form_data()))
                     .unwrap(),
             )
             .await
@@ -169,9 +208,11 @@ async fn sign_up_with_invalid_confirm_password_request(db: Database) {
     let cases = ["", "mismatched-confirm-password"];
 
     for case in cases {
-        let mut data = create_signup_data();
-        data.insert("password", "password123");
-        data.insert("confirm_password", case);
+        let payload = SignupPayload {
+            password: "password123",
+            confirm_password: case,
+            ..Default::default()
+        };
 
         let response = router
             .clone()
@@ -180,7 +221,7 @@ async fn sign_up_with_invalid_confirm_password_request(db: Database) {
                     .method(Method::POST)
                     .uri("/signup")
                     .header(CONTENT_TYPE, APPLICATION_WWW_FORM_URLENCODED.as_ref())
-                    .body(Body::from(create_form_data(&data)))
+                    .body(Body::from(payload.to_form_data()))
                     .unwrap(),
             )
             .await
@@ -193,7 +234,7 @@ async fn sign_up_with_invalid_confirm_password_request(db: Database) {
 #[sqlx::test]
 async fn sign_up_with_already_existing_email(db: Database) {
     let router = create_test_router(db).await;
-    let data = create_signup_data();
+    let payload = SignupPayload::default();
 
     let response = router
         .clone()
@@ -202,7 +243,7 @@ async fn sign_up_with_already_existing_email(db: Database) {
                 .method(Method::POST)
                 .uri("/signup")
                 .header(CONTENT_TYPE, APPLICATION_WWW_FORM_URLENCODED.as_ref())
-                .body(Body::from(create_form_data(&data)))
+                .body(Body::from(payload.to_form_data()))
                 .unwrap(),
         )
         .await
@@ -217,7 +258,7 @@ async fn sign_up_with_already_existing_email(db: Database) {
                 .method(Method::POST)
                 .uri("/signup")
                 .header(CONTENT_TYPE, APPLICATION_WWW_FORM_URLENCODED.as_ref())
-                .body(Body::from(create_form_data(&data)))
+                .body(Body::from(payload.to_form_data()))
                 .unwrap(),
         )
         .await
@@ -267,10 +308,11 @@ async fn get_signin_page_redirect_on_authenticated(db: Database) {
 #[sqlx::test]
 async fn sign_in(db: Database) {
     let router = create_test_router(db).await;
-    let mut data = HashMap::new();
-    data.insert("email", "test@example.pl");
-    data.insert("password", "password123");
-    data.insert("confirm_password", "password123");
+    let signup_payload = SignupPayload {
+        email: "test@example.com",
+        password: "password123",
+        confirm_password: "password123",
+    };
 
     let signup_response = router
         .clone()
@@ -279,7 +321,7 @@ async fn sign_in(db: Database) {
                 .method(Method::POST)
                 .uri("/signup")
                 .header(CONTENT_TYPE, APPLICATION_WWW_FORM_URLENCODED.as_ref())
-                .body(Body::from(create_form_data(&data)))
+                .body(Body::from(signup_payload.to_form_data()))
                 .unwrap(),
         )
         .await
@@ -287,7 +329,11 @@ async fn sign_in(db: Database) {
 
     assert_eq!(signup_response.status(), StatusCode::CREATED);
 
-    data.remove("confirm_password");
+    let signin_payload = SigninPayload {
+        email: "test@example.com",
+        password: "password123",
+    };
+
     let signin_response = router
         .clone()
         .oneshot(
@@ -295,7 +341,7 @@ async fn sign_in(db: Database) {
                 .method(Method::POST)
                 .uri("/signin")
                 .header(CONTENT_TYPE, APPLICATION_WWW_FORM_URLENCODED.as_ref())
-                .body(Body::from(create_form_data(&data)))
+                .body(Body::from(signin_payload.to_form_data()))
                 .unwrap(),
         )
         .await
@@ -323,8 +369,10 @@ async fn sign_in_with_invalid_email_request(db: Database) {
     let cases = ["", "invalid-email"];
 
     for case in cases {
-        let mut data = create_signin_data();
-        data.insert("email", case);
+        let payload = SigninPayload {
+            email: case,
+            ..Default::default()
+        };
 
         let response = router
             .clone()
@@ -333,7 +381,7 @@ async fn sign_in_with_invalid_email_request(db: Database) {
                     .method(Method::POST)
                     .uri("/signin")
                     .header(CONTENT_TYPE, APPLICATION_WWW_FORM_URLENCODED.as_ref())
-                    .body(Body::from(create_form_data(&data)))
+                    .body(Body::from(payload.to_form_data()))
                     .unwrap(),
             )
             .await
@@ -346,8 +394,10 @@ async fn sign_in_with_invalid_email_request(db: Database) {
 #[sqlx::test]
 async fn sign_in_with_invalid_password_request(db: Database) {
     let router = create_test_router(db).await;
-    let mut data = create_signin_data();
-    data.insert("password", "");
+    let payload = SigninPayload {
+        password: "",
+        ..Default::default()
+    };
 
     let response = router
         .oneshot(
@@ -355,7 +405,7 @@ async fn sign_in_with_invalid_password_request(db: Database) {
                 .method(Method::POST)
                 .uri("/signin")
                 .header(CONTENT_TYPE, APPLICATION_WWW_FORM_URLENCODED.as_ref())
-                .body(Body::from(create_form_data(&data)))
+                .body(Body::from(payload.to_form_data()))
                 .unwrap(),
         )
         .await
@@ -367,7 +417,7 @@ async fn sign_in_with_invalid_password_request(db: Database) {
 #[sqlx::test]
 async fn sign_in_with_non_existing_email(db: Database) {
     let router = create_test_router(db).await;
-    let data = create_signin_data();
+    let payload = SigninPayload::default();
 
     let response = router
         .oneshot(
@@ -375,7 +425,7 @@ async fn sign_in_with_non_existing_email(db: Database) {
                 .method(Method::POST)
                 .uri("/signin")
                 .header(CONTENT_TYPE, APPLICATION_WWW_FORM_URLENCODED.as_ref())
-                .body(Body::from(create_form_data(&data)))
+                .body(Body::from(payload.to_form_data()))
                 .unwrap(),
         )
         .await
@@ -387,7 +437,11 @@ async fn sign_in_with_non_existing_email(db: Database) {
 #[sqlx::test]
 async fn sign_in_with_invalid_password(db: Database) {
     let router = create_test_router(db).await;
-    let mut data = create_signup_data();
+    let signup_payload = SignupPayload {
+        email: "test@example.com",
+        password: "password123",
+        confirm_password: "password123",
+    };
 
     let signup_response = router
         .clone()
@@ -396,7 +450,7 @@ async fn sign_in_with_invalid_password(db: Database) {
                 .method(Method::POST)
                 .uri("/signup")
                 .header(CONTENT_TYPE, APPLICATION_WWW_FORM_URLENCODED.as_ref())
-                .body(Body::from(create_form_data(&data)))
+                .body(Body::from(signup_payload.to_form_data()))
                 .unwrap(),
         )
         .await
@@ -404,15 +458,18 @@ async fn sign_in_with_invalid_password(db: Database) {
 
     assert_eq!(signup_response.status(), StatusCode::CREATED);
 
-    data.insert("password", "invalid-password");
-    data.remove("confirm_password");
+    let signin_payload = SigninPayload {
+        email: "test@example.com",
+        password: "invalid-password",
+    };
+
     let signin_response = router
         .oneshot(
             Request::builder()
                 .method(Method::POST)
                 .uri("/signin")
                 .header(CONTENT_TYPE, APPLICATION_WWW_FORM_URLENCODED.as_ref())
-                .body(Body::from(create_form_data(&data)))
+                .body(Body::from(signin_payload.to_form_data()))
                 .unwrap(),
         )
         .await

@@ -101,7 +101,7 @@ async fn get_signup(Extension(options): Extension<RenderOptions>) -> SignupTempl
 }
 
 #[derive(Deserialize)]
-struct SignupRequest {
+struct SignupPayload {
     email: String,
     password: String,
     confirm_password: String,
@@ -116,16 +116,16 @@ struct SignupFormTemplate<'a> {
 async fn post_signup(
     State(state): State<AppState>,
     mut auth_session: AuthSession,
-    Form(data): Form<SignupRequest>,
+    Form(payload): Form<SignupPayload>,
 ) -> impl IntoResponse {
-    if let Err(form_data) = validate_signup_request(&data) {
+    if let Err(form_data) = validate_signup_payload(&payload) {
         let template = SignupFormTemplate { form_data };
         return (StatusCode::UNPROCESSABLE_ENTITY, template).into_response();
     }
     match sign_up(
         SignupData {
-            email: &data.email,
-            password: data.password,
+            email: &payload.email,
+            password: payload.password,
         },
         &state.db,
         &mut auth_session,
@@ -136,7 +136,9 @@ async fn post_signup(
         Err(e) => match e {
             SignupError::UserEmailAlreadyExistsError => {
                 let form_data = SignupFormData {
-                    values: SignupFormValues { email: &data.email },
+                    values: SignupFormValues {
+                        email: &payload.email,
+                    },
                     errors: SignupFormErrors {
                         email: Some(EMAIL_IS_ALREADY_TAKEN_MESSAGE),
                         ..Default::default()
@@ -154,36 +156,36 @@ async fn post_signup(
     }
 }
 
-fn validate_signup_request(data: &SignupRequest) -> Result<(), SignupFormData> {
+fn validate_signup_payload(payload: &SignupPayload) -> Result<(), SignupFormData> {
     let mut focus = SignupFormField::default();
     let mut errors = SignupFormErrors::default();
 
-    if data.confirm_password.is_empty() {
+    if payload.confirm_password.is_empty() {
         errors.confirm_password = Some(FIELD_REQUIRED_MESSAGE);
         focus = SignupFormField::ConfirmPassword;
-    } else if data.confirm_password != data.password {
+    } else if payload.confirm_password != payload.password {
         errors.confirm_password = Some(PASSWORD_MISMATCH_MESSAGE);
         focus = SignupFormField::ConfirmPassword;
     }
 
-    if data.password.is_empty() {
+    if payload.password.is_empty() {
         errors.password = Some(FIELD_REQUIRED_MESSAGE);
         focus = SignupFormField::Password;
-    } else if data.password.len() < PASSWORD_MIN_LENGTH {
+    } else if payload.password.len() < PASSWORD_MIN_LENGTH {
         errors.password = Some(PASSWORD_TOO_SHORT_MESSAGE);
         focus = SignupFormField::Password;
-    } else if data.password.len() > PASSWORD_MAX_LENGTH {
+    } else if payload.password.len() > PASSWORD_MAX_LENGTH {
         errors.password = Some(PASSWORD_TOO_LONG_MESSAGE);
         focus = SignupFormField::Password;
     }
 
-    if data.email.is_empty() {
+    if payload.email.is_empty() {
         errors.email = Some(FIELD_REQUIRED_MESSAGE);
         focus = SignupFormField::Email;
-    } else if data.email.len() > EMAIL_MAX_LENGTH {
+    } else if payload.email.len() > EMAIL_MAX_LENGTH {
         errors.email = Some(EMAIL_TOO_LONG_MESSAGE);
         focus = SignupFormField::Email;
-    } else if !is_valid_email(&data.email) {
+    } else if !is_valid_email(&payload.email) {
         errors.email = Some(INVALID_EMAIL_MESSAGE);
         focus = SignupFormField::Email;
     }
@@ -193,7 +195,9 @@ fn validate_signup_request(data: &SignupRequest) -> Result<(), SignupFormData> {
     }
     Err(SignupFormData {
         focus,
-        values: SignupFormValues { email: &data.email },
+        values: SignupFormValues {
+            email: &payload.email,
+        },
         errors,
     })
 }
@@ -261,7 +265,7 @@ async fn get_signin(
 }
 
 #[derive(Deserialize)]
-struct SigninRequest {
+struct SigninPayload {
     email: String,
     password: String,
     next: Option<String>,
@@ -275,24 +279,24 @@ struct SigninFormTemplate<'a> {
 
 async fn post_signin(
     mut auth_session: AuthSession,
-    Form(data): Form<SigninRequest>,
+    Form(payload): Form<SigninPayload>,
 ) -> impl IntoResponse {
-    if let Err(form_data) = validate_signin_request(&data) {
+    if let Err(form_data) = validate_signin_payload(&payload) {
         let template = SigninFormTemplate { form_data };
         return (StatusCode::UNPROCESSABLE_ENTITY, template).into_response();
     }
 
     match sign_in(
         SigninData {
-            email: data.email.clone(),
-            password: data.password,
+            email: payload.email.clone(),
+            password: payload.password,
         },
         &mut auth_session,
     )
     .await
     {
         Ok(_) => {
-            let next_url = data.next.as_deref().unwrap_or(PROTECTED_ROUTE);
+            let next_url = payload.next.as_deref().unwrap_or(PROTECTED_ROUTE);
             create_client_side_redirect(StatusCode::OK, next_url).into_response()
         }
         Err(e) => match e {
@@ -300,8 +304,8 @@ async fn post_signin(
                 let template = SigninFormTemplate {
                     form_data: SigninFormData {
                         values: SigninFormValues {
-                            email: &data.email,
-                            next: data.next.as_deref(),
+                            email: &payload.email,
+                            next: payload.next.as_deref(),
                         },
                         errors: SigninFormErrors {
                             general: Some(INVALID_CREDENTIALS_MESSAGE),
@@ -320,19 +324,19 @@ async fn post_signin(
     }
 }
 
-fn validate_signin_request(data: &SigninRequest) -> Result<(), SigninFormData> {
+fn validate_signin_payload(payload: &SigninPayload) -> Result<(), SigninFormData> {
     let mut focus = SigninFormField::default();
     let mut errors = SigninFormErrors::default();
 
-    if data.password.is_empty() {
+    if payload.password.is_empty() {
         errors.password = Some(FIELD_REQUIRED_MESSAGE);
         focus = SigninFormField::Password;
     }
 
-    if data.email.is_empty() {
+    if payload.email.is_empty() {
         errors.email = Some(FIELD_REQUIRED_MESSAGE);
         focus = SigninFormField::Email;
-    } else if !is_valid_email(&data.email) {
+    } else if !is_valid_email(&payload.email) {
         errors.email = Some(INVALID_EMAIL_MESSAGE);
         focus = SigninFormField::Email;
     }
@@ -343,8 +347,8 @@ fn validate_signin_request(data: &SigninRequest) -> Result<(), SigninFormData> {
     Err(SigninFormData {
         focus,
         values: SigninFormValues {
-            email: &data.email,
-            next: data.next.as_deref(),
+            email: &payload.email,
+            next: payload.next.as_deref(),
         },
         errors,
     })
