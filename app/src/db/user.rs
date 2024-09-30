@@ -116,7 +116,7 @@ mod tests {
     use super::AuthUser;
 
     #[test]
-    fn test_user_password_is_not_logged() {
+    fn user_password_is_not_logged() {
         let user = AuthUser {
             id: 1,
             password: String::from("password123"),

@@ -144,7 +144,7 @@ mod tests {
     use std::path::PathBuf;
 
     #[test]
-    fn test_append_hash_to_path() {
+    fn properly_append_hash_to_path() {
         let hash = "123";
         let tests = vec![
             ("dist/file.js", "dist/file.123.js"),

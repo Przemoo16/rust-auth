@@ -15,8 +15,12 @@ mod tests {
     use super::is_valid_email;
 
     #[test]
-    fn test_is_valid_email() {
+    fn email_is_valid() {
         assert!(is_valid_email("test@email.com"));
+    }
+
+    #[test]
+    fn email_is_invalid() {
         assert!(!is_valid_email("test"));
     }
 }
