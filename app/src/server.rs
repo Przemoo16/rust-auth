@@ -34,12 +34,6 @@ pub async fn run_server() {
 
     let router = create_router(&config, db, session_store.clone());
 
-    let deletion_task = spawn(
-        session_store.continuously_delete_expired(TaskDuration::from_secs(
-            config.auth.delete_expired_sessions_interval_seconds,
-        )),
-    );
-
     let socket_address = SocketAddr::from(([0, 0, 0, 0], PORT));
     let listener = tokio::net::TcpListener::bind(&socket_address)
         .await
@@ -47,6 +41,12 @@ pub async fn run_server() {
             "Failed to create listener bound to the {}",
             &socket_address
         ));
+    let deletion_task = spawn(
+        session_store.continuously_delete_expired(TaskDuration::from_secs(
+            config.auth.delete_expired_sessions_interval_seconds,
+        )),
+    );
+
     info!("Running server on {}", socket_address);
     axum::serve(listener, router)
         .with_graceful_shutdown(shutdown_signal(deletion_task.abort_handle()))
@@ -54,7 +54,7 @@ pub async fn run_server() {
         .expect("Failed to run the server");
 }
 
-fn create_router(config: &Config, db: Database, session_store: SessionStore) -> Router {
+pub fn create_router(config: &Config, db: Database, session_store: SessionStore) -> Router {
     let auth_layer = create_auth_layer(
         session_store,
         db.clone(),

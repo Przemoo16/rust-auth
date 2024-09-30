@@ -25,3 +25,7 @@ tower-sessions = { version = "0.12.2", features = ["signed"] }
 tower-sessions-sqlx-store = { version = "0.13.0", features = ["postgres"] }
 tracing = "0.1.40"
 tracing-subscriber = "0.3.18"
+
+[dev-dependencies]
+mime = "0.3.17"
+urlencoding = "2.1.3"
