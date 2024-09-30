@@ -70,7 +70,7 @@ async fn get_signup_page_redirect_on_authenticated(db: Database) {
 }
 
 #[sqlx::test]
-async fn signup(db: Database) {
+async fn sign_up(db: Database) {
     let router = create_test_router(db).await;
     let mut data = HashMap::new();
     data.insert("email", "test@example.pl");
@@ -107,7 +107,91 @@ async fn signup(db: Database) {
 }
 
 #[sqlx::test]
-async fn signup_with_already_existing_email(db: Database) {
+async fn sign_up_with_invalid_email_request(db: Database) {
+    let router = create_test_router(db).await;
+    let cases = [
+        "",
+        &format!("{}@email.com", "a".repeat(245)),
+        "invalid-email",
+    ];
+
+    for case in cases {
+        let mut data = create_signup_data();
+        data.insert("email", case);
+
+        let response = router
+            .clone()
+            .oneshot(
+                Request::builder()
+                    .method(Method::POST)
+                    .uri("/signup")
+                    .header(CONTENT_TYPE, APPLICATION_WWW_FORM_URLENCODED.as_ref())
+                    .body(Body::from(create_form_data(&data)))
+                    .unwrap(),
+            )
+            .await
+            .unwrap();
+
+        assert_eq!(response.status(), StatusCode::UNPROCESSABLE_ENTITY);
+    }
+}
+
+#[sqlx::test]
+async fn sign_up_with_invalid_password_request(db: Database) {
+    let router = create_test_router(db).await;
+    let cases = ["", "a", &"a".repeat(257)];
+
+    for case in cases {
+        let mut data = create_signup_data();
+        data.insert("password", case);
+        data.insert("confirm_password", case);
+
+        let response = router
+            .clone()
+            .oneshot(
+                Request::builder()
+                    .method(Method::POST)
+                    .uri("/signup")
+                    .header(CONTENT_TYPE, APPLICATION_WWW_FORM_URLENCODED.as_ref())
+                    .body(Body::from(create_form_data(&data)))
+                    .unwrap(),
+            )
+            .await
+            .unwrap();
+
+        assert_eq!(response.status(), StatusCode::UNPROCESSABLE_ENTITY);
+    }
+}
+
+#[sqlx::test]
+async fn sign_up_with_invalid_confirm_password_request(db: Database) {
+    let router = create_test_router(db).await;
+    let cases = ["", "mismatched-confirm-password"];
+
+    for case in cases {
+        let mut data = create_signup_data();
+        data.insert("password", "password123");
+        data.insert("confirm_password", case);
+
+        let response = router
+            .clone()
+            .oneshot(
+                Request::builder()
+                    .method(Method::POST)
+                    .uri("/signup")
+                    .header(CONTENT_TYPE, APPLICATION_WWW_FORM_URLENCODED.as_ref())
+                    .body(Body::from(create_form_data(&data)))
+                    .unwrap(),
+            )
+            .await
+            .unwrap();
+
+        assert_eq!(response.status(), StatusCode::UNPROCESSABLE_ENTITY);
+    }
+}
+
+#[sqlx::test]
+async fn sign_up_with_already_existing_email(db: Database) {
     let router = create_test_router(db).await;
     let data = create_signup_data();
 
@@ -143,86 +227,6 @@ async fn signup_with_already_existing_email(db: Database) {
 }
 
 #[sqlx::test]
-async fn signup_with_invalid_email_request(db: Database) {
-    let router = create_test_router(db).await;
-    let cases = ["", &format!("{}@email.com", "a".repeat(245)), "test"];
-
-    for case in cases {
-        let mut data = create_signup_data();
-        data.insert("email", case);
-
-        let response = router
-            .clone()
-            .oneshot(
-                Request::builder()
-                    .method(Method::POST)
-                    .uri("/signup")
-                    .header(CONTENT_TYPE, APPLICATION_WWW_FORM_URLENCODED.as_ref())
-                    .body(Body::from(create_form_data(&data)))
-                    .unwrap(),
-            )
-            .await
-            .unwrap();
-
-        assert_eq!(response.status(), StatusCode::UNPROCESSABLE_ENTITY);
-    }
-}
-
-#[sqlx::test]
-async fn signup_with_invalid_password_request(db: Database) {
-    let router = create_test_router(db).await;
-    let cases = ["", "a", &"a".repeat(257)];
-
-    for case in cases {
-        let mut data = create_signup_data();
-        data.insert("password", case);
-        data.insert("confirm_password", case);
-
-        let response = router
-            .clone()
-            .oneshot(
-                Request::builder()
-                    .method(Method::POST)
-                    .uri("/signup")
-                    .header(CONTENT_TYPE, APPLICATION_WWW_FORM_URLENCODED.as_ref())
-                    .body(Body::from(create_form_data(&data)))
-                    .unwrap(),
-            )
-            .await
-            .unwrap();
-
-        assert_eq!(response.status(), StatusCode::UNPROCESSABLE_ENTITY);
-    }
-}
-
-#[sqlx::test]
-async fn signup_with_invalid_confirm_password_request(db: Database) {
-    let router = create_test_router(db).await;
-    let cases = ["", &"a".repeat(257)];
-
-    for case in cases {
-        let mut data = create_signup_data();
-        data.insert("password", "password123");
-        data.insert("confirm_password", case);
-
-        let response = router
-            .clone()
-            .oneshot(
-                Request::builder()
-                    .method(Method::POST)
-                    .uri("/signup")
-                    .header(CONTENT_TYPE, APPLICATION_WWW_FORM_URLENCODED.as_ref())
-                    .body(Body::from(create_form_data(&data)))
-                    .unwrap(),
-            )
-            .await
-            .unwrap();
-
-        assert_eq!(response.status(), StatusCode::UNPROCESSABLE_ENTITY);
-    }
-}
-
-#[sqlx::test]
 async fn get_signin_page(db: Database) {
     let router = create_test_router(db).await;
 
@@ -241,7 +245,27 @@ async fn get_signin_page(db: Database) {
 }
 
 #[sqlx::test]
-async fn signin(db: Database) {
+async fn get_signin_page_redirect_on_authenticated(db: Database) {
+    let router = create_test_router(db).await;
+    let auth_cookie = get_authenticated_user_cookie(router.clone()).await;
+
+    let response = router
+        .oneshot(
+            Request::builder()
+                .uri("/signin")
+                .header(COOKIE, auth_cookie)
+                .body(Body::empty())
+                .unwrap(),
+        )
+        .await
+        .unwrap();
+
+    assert_eq!(response.status(), StatusCode::TEMPORARY_REDIRECT);
+    assert_eq!(response.headers().get(LOCATION).unwrap(), "/protected");
+}
+
+#[sqlx::test]
+async fn sign_in(db: Database) {
     let router = create_test_router(db).await;
     let mut data = HashMap::new();
     data.insert("email", "test@example.pl");
@@ -294,29 +318,9 @@ async fn signin(db: Database) {
 }
 
 #[sqlx::test]
-async fn get_signin_page_redirect_on_authenticated(db: Database) {
+async fn sign_in_with_invalid_email_request(db: Database) {
     let router = create_test_router(db).await;
-    let auth_cookie = get_authenticated_user_cookie(router.clone()).await;
-
-    let response = router
-        .oneshot(
-            Request::builder()
-                .uri("/signin")
-                .header(COOKIE, auth_cookie)
-                .body(Body::empty())
-                .unwrap(),
-        )
-        .await
-        .unwrap();
-
-    assert_eq!(response.status(), StatusCode::TEMPORARY_REDIRECT);
-    assert_eq!(response.headers().get(LOCATION).unwrap(), "/protected");
-}
-
-#[sqlx::test]
-async fn signin_with_invalid_email_request(db: Database) {
-    let router = create_test_router(db).await;
-    let cases = ["", "test"];
+    let cases = ["", "invalid-email"];
 
     for case in cases {
         let mut data = create_signin_data();
@@ -340,7 +344,7 @@ async fn signin_with_invalid_email_request(db: Database) {
 }
 
 #[sqlx::test]
-async fn signin_with_invalid_password_request(db: Database) {
+async fn sign_in_with_invalid_password_request(db: Database) {
     let router = create_test_router(db).await;
     let mut data = create_signin_data();
     data.insert("password", "");
@@ -361,7 +365,7 @@ async fn signin_with_invalid_password_request(db: Database) {
 }
 
 #[sqlx::test]
-async fn signin_with_non_existing_email(db: Database) {
+async fn sign_in_with_non_existing_email(db: Database) {
     let router = create_test_router(db).await;
     let data = create_signin_data();
 
@@ -381,9 +385,9 @@ async fn signin_with_non_existing_email(db: Database) {
 }
 
 #[sqlx::test]
-async fn signin_with_invalid_password(db: Database) {
+async fn sign_in_with_invalid_password(db: Database) {
     let router = create_test_router(db).await;
-    let signup_data = create_signup_data();
+    let mut data = create_signup_data();
 
     let signup_response = router
         .clone()
@@ -392,7 +396,7 @@ async fn signin_with_invalid_password(db: Database) {
                 .method(Method::POST)
                 .uri("/signup")
                 .header(CONTENT_TYPE, APPLICATION_WWW_FORM_URLENCODED.as_ref())
-                .body(Body::from(create_form_data(&signup_data)))
+                .body(Body::from(create_form_data(&data)))
                 .unwrap(),
         )
         .await
@@ -400,16 +404,15 @@ async fn signin_with_invalid_password(db: Database) {
 
     assert_eq!(signup_response.status(), StatusCode::CREATED);
 
-    let mut signin_data = create_signin_data();
-    signin_data.insert("password", "invalid-password");
-
+    data.insert("password", "invalid-password");
+    data.remove("confirm_password");
     let signin_response = router
         .oneshot(
             Request::builder()
                 .method(Method::POST)
                 .uri("/signin")
                 .header(CONTENT_TYPE, APPLICATION_WWW_FORM_URLENCODED.as_ref())
-                .body(Body::from(create_form_data(&signin_data)))
+                .body(Body::from(create_form_data(&data)))
                 .unwrap(),
         )
         .await
@@ -419,11 +422,11 @@ async fn signin_with_invalid_password(db: Database) {
 }
 
 #[sqlx::test]
-async fn signout(db: Database) {
+async fn sign_out(db: Database) {
     let router = create_test_router(db).await;
     let auth_cookie = get_authenticated_user_cookie(router.clone()).await;
 
-    let response = router
+    let signout_response = router
         .clone()
         .oneshot(
             Request::builder()
@@ -436,7 +439,7 @@ async fn signout(db: Database) {
         .await
         .unwrap();
 
-    assert_eq!(response.status(), StatusCode::NO_CONTENT);
+    assert_eq!(signout_response.status(), StatusCode::NO_CONTENT);
 
     let protected_response = router
         .oneshot(

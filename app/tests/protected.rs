@@ -54,7 +54,7 @@ async fn get_protected_page_redirect_on_not_authenticated(db: Database) {
 }
 
 #[sqlx::test]
-async fn no_cache_private_pages(db: Database) {
+async fn dont_cache_protected_pages(db: Database) {
     let router = create_test_router(db).await;
     let auth_cookie = get_authenticated_user_cookie(router.clone()).await;
 

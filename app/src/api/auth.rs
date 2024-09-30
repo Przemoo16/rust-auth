@@ -161,7 +161,7 @@ fn validate_signup_request(data: &SignupRequest) -> Result<(), SignupFormData> {
     if data.confirm_password.is_empty() {
         errors.confirm_password = Some(FIELD_REQUIRED_MESSAGE);
         focus = SignupFormField::ConfirmPassword;
-    } else if data.password != data.confirm_password {
+    } else if data.confirm_password != data.password {
         errors.confirm_password = Some(PASSWORD_MISMATCH_MESSAGE);
         focus = SignupFormField::ConfirmPassword;
     }

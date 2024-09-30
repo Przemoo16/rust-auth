@@ -64,7 +64,7 @@ async fn get_404_page(db: Database) {
 }
 
 #[sqlx::test]
-async fn no_cache_pages(db: Database) {
+async fn dont_cache_pages_by_default(db: Database) {
     let router = create_test_router(db).await;
 
     let response = router
