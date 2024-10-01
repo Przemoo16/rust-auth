@@ -248,7 +248,6 @@ async fn sign_up_with_already_existing_email(db: Database) {
     assert_eq!(response.status(), StatusCode::CREATED);
 
     let response = router
-        .clone()
         .oneshot(
             Request::builder()
                 .method(Method::POST)
