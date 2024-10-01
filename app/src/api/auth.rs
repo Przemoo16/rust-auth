@@ -9,12 +9,12 @@ use crate::{
         middleware::RenderOptions,
         response::{create_client_side_redirect, create_redirect_for_authenticated},
     },
+    controllers::auth::{
+        sign_in, sign_out, sign_up, SigninData, SigninError, SignupData, SignupError,
+    },
     libs::{
         auth::{is_anonymous, AuthSession},
         validation::is_valid_email,
-    },
-    operations::auth::{
-        sign_in, sign_out, sign_up, SigninData, SigninError, SignupData, SignupError,
     },
     state::AppState,
 };

@@ -4,6 +4,6 @@ pub mod libs;
 pub mod server;
 
 mod api;
-mod operations;
+mod controllers;
 mod state;
 mod tracing;
