@@ -1,7 +1,6 @@
 use crate::{
     api::{
         layer::create_auth_layer,
-        main::handler_404,
         middleware::{set_default_response_headers, set_request_render_options},
         router::create_api_router,
     },
@@ -64,7 +63,6 @@ pub fn create_router(config: &Config, db: Database, session_store: SessionStore)
     let state = AppState::new(db);
     Router::new()
         .merge(create_api_router())
-        .fallback(handler_404)
         .with_state(state)
         .layer(
             ServiceBuilder::new()
