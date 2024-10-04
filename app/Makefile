@@ -7,6 +7,7 @@ build:
 	yarn run uglifyjs --compress --mangle -o ./dist/scripts/htmx.js ./scripts/htmx.js ./scripts/htmx-ext-loading-states.js
 	yarn run uglifyjs --compress --mangle -o ./dist/scripts/main.js ./scripts/main.js
 	cargo run --manifest-path tools/cache_buster/Cargo.toml dist
+	sqlx migrate run
 
 test: build
 	cargo test
