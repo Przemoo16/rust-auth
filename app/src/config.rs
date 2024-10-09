@@ -4,6 +4,7 @@ use std::env::var;
 pub struct Config {
     pub auth: AuthConfig,
     pub db: DatabaseConfig,
+    pub logging: LoggingConfig,
 }
 
 impl Config {
@@ -11,6 +12,7 @@ impl Config {
         Self {
             auth: AuthConfig::from_env(),
             db: DatabaseConfig::from_env(),
+            logging: LoggingConfig::from_env(),
         }
     }
 }
@@ -49,6 +51,18 @@ impl DatabaseConfig {
             pool_max_connections: read_env("DATABASE_POOL_MAX_CONNECTIONS")
                 .parse()
                 .expect("DATABASE_POOL_MAX_CONNECTIONS must be a number"),
+        }
+    }
+}
+
+pub struct LoggingConfig {
+    pub level: String,
+}
+
+impl LoggingConfig {
+    pub fn from_env() -> Self {
+        Self {
+            level: read_env("LOGGING_LEVEL"),
         }
     }
 }

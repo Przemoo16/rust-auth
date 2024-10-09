@@ -10,6 +10,7 @@ use once_cell::sync::Lazy;
 use regex::Regex;
 use tower::ServiceExt;
 use tower_http::services::ServeDir;
+use tracing::warn;
 
 const ASSET_CACHE_CONTROL_HEADER: &str = "public, max-age=31536000, immutable";
 
@@ -45,6 +46,8 @@ async fn serve_dir(path: &str, request: Request) -> impl IntoResponse {
                 response
                     .headers_mut()
                     .insert(ETAG, etag.parse().expect("Invalid header value"));
+            } else {
+                warn!("Asset {} doesn't contain etag", path)
             }
         }
         response

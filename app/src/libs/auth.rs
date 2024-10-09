@@ -17,6 +17,7 @@ use std::{
     error::Error,
     fmt::{Display, Formatter, Result as FormatResult},
 };
+use tracing::debug;
 
 #[derive(Clone)]
 pub struct Backend {
@@ -104,8 +105,11 @@ impl AuthnBackend for Backend {
         if let Some(user) = get_auth_user_by_email(&creds.email, &self.db).await? {
             if verify_password_in_separate_thread(creds.password, user.password.clone()).await? {
                 return Ok(Some(user));
+            } else {
+                debug!("Invalid password for user with email {}", creds.email);
             }
         } else {
+            debug!("User with email {} not found", creds.email);
             // Run the password hasher to mitigate timing attack
             hash_password_in_separate_thread(creds.password).await?;
         }

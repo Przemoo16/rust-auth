@@ -24,9 +24,9 @@ use tracing::info;
 const PORT: u16 = 3000;
 
 pub async fn run_server() {
-    setup_tracing();
-
     let config = Config::from_env();
+
+    setup_tracing(&config.logging.level);
 
     let db = setup_db_pool(&config.db.url, config.db.pool_max_connections).await;
     let session_store = setup_session_store(db.clone()).await;
