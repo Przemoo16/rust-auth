@@ -102,18 +102,24 @@ impl AuthnBackend for Backend {
         &self,
         creds: Self::Credentials,
     ) -> Result<Option<Self::User>, Self::Error> {
-        if let Some(user) = get_auth_user_by_email(&creds.email, &self.db).await? {
-            if verify_password_in_separate_thread(creds.password, user.password.clone()).await? {
-                return Ok(Some(user));
-            } else {
-                debug!("Invalid password for user with email {}", creds.email);
+        let user_res = match get_auth_user_by_email(&creds.email, &self.db).await? {
+            None => {
+                debug!("User with email {} not found", creds.email);
+                // Run the password hasher to mitigate timing attack
+                hash_password_in_separate_thread(creds.password).await?;
+                None
             }
-        } else {
-            debug!("User with email {} not found", creds.email);
-            // Run the password hasher to mitigate timing attack
-            hash_password_in_separate_thread(creds.password).await?;
-        }
-        Ok(None)
+            Some(user) => {
+                if verify_password_in_separate_thread(creds.password, user.password.clone()).await?
+                {
+                    Some(user)
+                } else {
+                    debug!("Invalid password for user with email {}", creds.email);
+                    None
+                }
+            }
+        };
+        Ok(user_res)
     }
 
     async fn get_user(&self, user_id: &UserId<Self>) -> Result<Option<Self::User>, Self::Error> {

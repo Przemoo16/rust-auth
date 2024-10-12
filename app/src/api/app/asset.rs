@@ -36,18 +36,21 @@ async fn serve_dir(path: &str, request: Request) -> impl IntoResponse {
     let result = ServeDir::new(path).oneshot(request).await;
     result.map(|mut response| {
         if response.status().is_success() {
-            if let Some(etag) = extracted_etag {
-                response.headers_mut().insert(
-                    CACHE_CONTROL,
-                    ASSET_CACHE_CONTROL_HEADER
-                        .parse()
-                        .expect("Invalid header value"),
-                );
-                response
-                    .headers_mut()
-                    .insert(ETAG, etag.parse().expect("Invalid header value"));
-            } else {
-                warn!("Asset {} doesn't contain etag", path)
+            match extracted_etag {
+                None => {
+                    warn!("Asset {} doesn't contain etag", path)
+                }
+                Some(etag) => {
+                    response.headers_mut().insert(
+                        CACHE_CONTROL,
+                        ASSET_CACHE_CONTROL_HEADER
+                            .parse()
+                            .expect("Invalid header value"),
+                    );
+                    response
+                        .headers_mut()
+                        .insert(ETAG, etag.parse().expect("Invalid header value"));
+                }
             }
         }
         response

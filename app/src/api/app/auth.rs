@@ -132,7 +132,6 @@ async fn post_signup(
     )
     .await
     {
-        Ok(_) => create_client_side_redirect(StatusCode::CREATED, PROTECTED_ROUTE).into_response(),
         Err(e) => match e {
             SignupError::UserEmailAlreadyExistsError => {
                 let form_data = SignupFormData {
@@ -153,6 +152,7 @@ async fn post_signup(
                 StatusCode::INTERNAL_SERVER_ERROR.into_response()
             }
         },
+        Ok(_) => create_client_side_redirect(StatusCode::CREATED, PROTECTED_ROUTE).into_response(),
     }
 }
 
@@ -295,10 +295,6 @@ async fn post_signin(
     )
     .await
     {
-        Ok(_) => {
-            let next_url = payload.next.as_deref().unwrap_or(PROTECTED_ROUTE);
-            create_client_side_redirect(StatusCode::OK, next_url).into_response()
-        }
         Err(e) => match e {
             SigninError::InvalidCredentialsError => {
                 let template = SigninFormTemplate {
@@ -321,6 +317,10 @@ async fn post_signin(
                 StatusCode::INTERNAL_SERVER_ERROR.into_response()
             }
         },
+        Ok(_) => {
+            let next_url = payload.next.as_deref().unwrap_or(PROTECTED_ROUTE);
+            create_client_side_redirect(StatusCode::OK, next_url).into_response()
+        }
     }
 }
 
@@ -341,25 +341,25 @@ fn validate_signin_payload(payload: &SigninPayload) -> Result<(), SigninFormData
         focus = SigninFormField::Email;
     }
 
-    if !errors.has_errors() {
-        return Ok(());
+    if errors.has_errors() {
+        return Err(SigninFormData {
+            focus,
+            values: SigninFormValues {
+                email: &payload.email,
+                next: payload.next.as_deref(),
+            },
+            errors,
+        });
     }
-    Err(SigninFormData {
-        focus,
-        values: SigninFormValues {
-            email: &payload.email,
-            next: payload.next.as_deref(),
-        },
-        errors,
-    })
+    Ok(())
 }
 
 async fn post_signout(mut auth_session: AuthSession) -> impl IntoResponse {
     match sign_out(&mut auth_session).await {
-        Ok(_) => create_client_side_redirect(StatusCode::NO_CONTENT, HOME_ROUTE).into_response(),
         Err(e) => {
             error!("Failed to sign out: {:?}", e);
             StatusCode::INTERNAL_SERVER_ERROR.into_response()
         }
+        Ok(_) => create_client_side_redirect(StatusCode::NO_CONTENT, HOME_ROUTE).into_response(),
     }
 }

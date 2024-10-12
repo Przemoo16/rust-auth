@@ -102,15 +102,15 @@ impl Iterator for DirWalker {
                 return Some(Ok(path));
             }
             match read_dir(&path) {
+                Err(e) => return Some(Err(e)),
                 Ok(iter) => {
                     for entry in iter {
                         match entry {
-                            Ok(sub_path) => self.stack.push(sub_path.path()),
                             Err(e) => return Some(Err(e)),
+                            Ok(sub_path) => self.stack.push(sub_path.path()),
                         }
                     }
                 }
-                Err(e) => return Some(Err(e)),
             }
         }
         None
